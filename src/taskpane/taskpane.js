@@ -305,14 +305,22 @@ async function createConversation() {
       headers: API_CONFIG.headers,
       data: data
     });
-    
-    const response = await fetch(url, {
+
+    // 配置fetch选项
+    const fetchOptions = {
       method: 'POST',
       headers: API_CONFIG.headers,
-      body: JSON.stringify(data)
-    });
+      body: JSON.stringify(data),
+      mode: 'cors', // 明确指定CORS模式
+      credentials: 'omit' // 不发送凭据
+    };
+
+    console.log('🌐 Fetch选项:', fetchOptions);
+    
+    const response = await fetch(url, fetchOptions);
     
     console.log('📡 HTTP响应状态:', response.status, response.statusText);
+    console.log('📡 响应头:', [...response.headers.entries()]);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -329,10 +337,29 @@ async function createConversation() {
     return parsed;
     
   } catch (error) {
-    console.error('❌ 创建对话失败:', error);
+    console.error('❌ 创建对话失败 - 详细错误:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+    
+    // 根据错误类型提供更有用的错误信息
+    let userFriendlyError = '';
+    if (error.message.includes('Failed to fetch')) {
+      userFriendlyError = '网络连接失败，可能是CORS跨域问题或网络不可达。请检查网络连接或联系管理员。';
+    } else if (error.message.includes('NetworkError')) {
+      userFriendlyError = '网络错误，请检查您的网络连接。';
+    } else if (error.message.includes('TypeError')) {
+      userFriendlyError = '请求配置错误，请检查API配置。';
+    } else {
+      userFriendlyError = error.message || '创建对话失败';
+    }
+    
     return {
       success: false,
-      error: error.message || '创建对话失败'
+      error: userFriendlyError,
+      originalError: error.message
     };
   }
 }
@@ -355,14 +382,20 @@ async function sendChatMessage(conversationId, message) {
       messageLength: message.length,
       data: data
     });
-    
-    const response = await fetch(url, {
+
+    // 配置fetch选项
+    const fetchOptions = {
       method: 'POST',
       headers: API_CONFIG.headers,
-      body: JSON.stringify(data)
-    });
+      body: JSON.stringify(data),
+      mode: 'cors',
+      credentials: 'omit'
+    };
+    
+    const response = await fetch(url, fetchOptions);
     
     console.log('📡 消息HTTP响应状态:', response.status, response.statusText);
+    console.log('📡 响应头:', [...response.headers.entries()]);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -379,10 +412,26 @@ async function sendChatMessage(conversationId, message) {
     return parsed;
     
   } catch (error) {
-    console.error('❌ 发送消息失败:', error);
+    console.error('❌ 发送消息失败 - 详细错误:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+    
+    // 根据错误类型提供更有用的错误信息
+    let userFriendlyError = '';
+    if (error.message.includes('Failed to fetch')) {
+      userFriendlyError = '网络连接失败，可能是CORS跨域问题或API服务器不可达。';
+    } else if (error.message.includes('NetworkError')) {
+      userFriendlyError = '网络错误，请检查您的网络连接。';
+    } else {
+      userFriendlyError = error.message || '发送消息失败';
+    }
+    
     return {
       success: false,
-      error: error.message || '发送消息失败'
+      error: userFriendlyError,
+      originalError: error.message
     };
   }
 }
@@ -829,8 +878,35 @@ window.debugGPTBots = {
     }
   },
   
+  testConnection: async function() {
+    console.log('🌐 测试API连接...');
+    try {
+      // 简单的连通性测试
+      const url = API_CONFIG.baseUrl;
+      console.log('测试URL:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        mode: 'no-cors' // 使用no-cors模式避免CORS问题
+      });
+      
+      console.log('连接测试结果:', response);
+      console.log('Response type:', response.type);
+      console.log('Response status:', response.status);
+      
+      if (response.type === 'opaque') {
+        console.log('✅ 服务器可达，但响应被CORS策略阻止（这是正常的）');
+      }
+      
+    } catch (error) {
+      console.error('❌ 连接测试失败:', error);
+    }
+  },
+  
   showConfig: function() {
     console.log('📋 当前API配置:', API_CONFIG);
+    console.log('📋 创建对话URL:', getCreateConversationUrl());
+    console.log('📋 发送消息URL:', getChatUrl());
   },
   
   testEmail: async function() {
@@ -841,10 +917,25 @@ window.debugGPTBots = {
     } catch (error) {
       console.error('邮件读取测试失败:', error);
     }
+  },
+  
+  simulateTranslate: async function() {
+    console.log('🔄 模拟翻译测试...');
+    try {
+      // 模拟翻译请求
+      const testPrompt = '请帮我翻译：Hello, this is a test message.';
+      const response = await sendToGPTBotsAPI(testPrompt);
+      console.log('翻译测试结果:', response);
+    } catch (error) {
+      console.error('翻译测试失败:', error);
+    }
   }
 };
 
 console.log('🔧 调试工具已加载! 使用方法:');
-console.log('  debugGPTBots.testAPI() - 测试API连接');
-console.log('  debugGPTBots.showConfig() - 显示配置');
+console.log('  debugGPTBots.testConnection() - 测试API服务器连通性');
+console.log('  debugGPTBots.testAPI() - 完整API功能测试');
+console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
+console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
+console.log('💡 如果遇到"Failed to fetch"错误，请先运行 debugGPTBots.testConnection()');
