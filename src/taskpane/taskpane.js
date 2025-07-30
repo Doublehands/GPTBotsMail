@@ -345,22 +345,22 @@ async function sendToGPTBotsAPI(message) {
 }
 
 /**
- * 创建对话（支持多级代理重试）
+ * 创建对话（先直接调用，再尝试代理）
  */
 async function createConversation() {
-  // 尝试主要代理 (ThingProxy)
-  const result = await createConversationWithUrl(getCreateConversationUrl(), '主要代理(ThingProxy)');
+  // 先尝试直接调用GPTBots API（manifest.xml已添加权限）
+  const result = await createConversationWithUrl(getCreateConversationUrl(), '直接调用GPTBots');
   
   if (!result.success) {
-    console.log('🔄 主要代理失败，尝试备用代理...');
-    const fallbackResult = await createConversationWithUrl(getCreateConversationUrlFallback(), '备用代理(CORS.SH)');
+    console.log('🔄 直接调用失败，尝试ThingProxy代理...');
+    const fallbackResult = await createConversationWithUrl(getCreateConversationUrlFallback(), 'ThingProxy代理');
     
     if (!fallbackResult.success) {
-      console.log('🔄 所有代理都失败，尝试最后方案...');
+      console.log('🔄 ThingProxy失败，尝试最后方案...');
       // 最后尝试一个不同的代理格式
       const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
-      const lastResortUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(originalUrl)}`;
-      return await createConversationWithUrl(lastResortUrl, '最后代理(CodeTabs)');
+      const lastResortUrl = `https://proxy.cors.sh/${originalUrl}`;
+      return await createConversationWithUrl(lastResortUrl, 'CORS.SH代理');
     }
     
     return fallbackResult;
@@ -383,20 +383,17 @@ async function createConversationWithUrl(url, proxyName) {
       data: data
     });
 
-    // 配置fetch选项（尝试多种CORS配置）
+    // 直接使用fetch方法（已在manifest.xml中添加域名权限）
+    console.log(`🌐 ${proxyName} - 使用Fetch方法`);
     const fetchOptions = {
       method: 'POST',
       headers: {
         ...API_CONFIG.headers,
-        // 尝试添加一些可能有用的头
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
+        'Accept': 'application/json'
       },
       body: JSON.stringify(data),
-      mode: 'cors', // 尝试CORS模式
-      credentials: 'omit',
-      cache: 'no-cache',
-      referrer: 'no-referrer'
+      mode: 'cors',
+      credentials: 'omit'
     };
 
     console.log(`🌐 ${proxyName} - Fetch选项:`, fetchOptions);
@@ -453,22 +450,22 @@ async function createConversationWithUrl(url, proxyName) {
 }
 
 /**
- * 发送聊天消息（支持多级代理重试）
+ * 发送聊天消息（先直接调用，再尝试代理）
  */
 async function sendChatMessage(conversationId, message) {
-  // 尝试主要代理 (ThingProxy)
-  const result = await sendChatMessageWithUrl(getChatUrl(), conversationId, message, '主要代理(ThingProxy)');
+  // 先尝试直接调用GPTBots API（manifest.xml已添加权限）
+  const result = await sendChatMessageWithUrl(getChatUrl(), conversationId, message, '直接调用GPTBots');
   
   if (!result.success) {
-    console.log('🔄 主要代理失败，尝试备用代理...');
-    const fallbackResult = await sendChatMessageWithUrl(getChatUrlFallback(), conversationId, message, '备用代理(CORS.SH)');
+    console.log('🔄 直接调用失败，尝试ThingProxy代理...');
+    const fallbackResult = await sendChatMessageWithUrl(getChatUrlFallback(), conversationId, message, 'ThingProxy代理');
     
     if (!fallbackResult.success) {
-      console.log('🔄 所有代理都失败，尝试最后方案...');
+      console.log('🔄 ThingProxy失败，尝试最后方案...');
       // 最后尝试一个不同的代理格式
       const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
-      const lastResortUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(originalUrl)}`;
-      return await sendChatMessageWithUrl(lastResortUrl, conversationId, message, '最后代理(CodeTabs)');
+      const lastResortUrl = `https://proxy.cors.sh/${originalUrl}`;
+      return await sendChatMessageWithUrl(lastResortUrl, conversationId, message, 'CORS.SH代理');
     }
     
     return fallbackResult;
@@ -1106,10 +1103,12 @@ window.debugGPTBots = {
   }
 };
 
-// 显示代理状态
-console.log('🔍 代理状态检查:');
-console.log('  创建对话URL:', getCreateConversationUrl());
-console.log('  发送消息URL:', getChatUrl());
+// 显示CSP解决方案状态
+console.log('🔍 CSP解决方案状态检查:');
+console.log('  直接调用创建对话URL:', getCreateConversationUrl());
+console.log('  直接调用发送消息URL:', getChatUrl());
+console.log('  备用ThingProxy创建对话URL:', getCreateConversationUrlFallback());
+console.log('  备用ThingProxy发送消息URL:', getChatUrlFallback());
 
 console.log('🔧 调试工具已加载! 使用方法:');
 console.log('  debugGPTBots.testConnection() - 测试API和CORS代理连通性');
@@ -1118,11 +1117,11 @@ console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
 console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
 console.log('');
-console.log('🛠️ CORS解决方案已升级到三级重试：');
-console.log('  - 🥇 主要代理: thingproxy.freeboard.io（支持Authorization头）');
-console.log('  - 🥈 备用代理: proxy.cors.sh（支持复杂请求）');
-console.log('  - 🥉 最后代理: api.codetabs.com（终极备选）');
-console.log('  - 🔄 智能重试：失败时自动切换到下一个代理');
-console.log('  - 🔧 解决方案：使用支持Authorization头的专业代理服务');
+console.log('🛠️ CSP解决方案已实施：');
+console.log('  - 🎯 直接调用: 已在manifest.xml中添加api.gptbots.ai域名权限');
+console.log('  - 🥇 备用方案1: thingproxy.freeboard.io（支持Authorization头）');
+console.log('  - 🥈 备用方案2: proxy.cors.sh（支持复杂请求）');
+console.log('  - 🔄 智能重试：直接调用失败时自动切换到代理');
+console.log('  - 🔧 解决方案：先尝试绕过CSP，再使用代理服务');
 console.log('');
-console.log('💡 三级代理确保最大成功率，已解决Authorization头被阻止的问题');
+console.log('💡 已解决Content Security Policy限制问题');

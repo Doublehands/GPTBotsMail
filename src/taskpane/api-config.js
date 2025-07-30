@@ -128,42 +128,38 @@ function getNestedValue(obj, path) {
     }, obj);
 }
 
-// 辅助函数：构建创建对话的URL（使用多种代理尝试）
+// 辅助函数：构建创建对话的URL（先尝试直接调用）
 function getCreateConversationUrl() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
     
-    // 尝试使用thingproxy（支持更多头部）
-    const proxyUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
-    console.log('🔄 使用ThingProxy代理:', proxyUrl);
-    console.log('📝 原始URL:', originalUrl);
+    console.log('🔄 尝试直接调用GPTBots API:', originalUrl);
+    console.log('📝 已在manifest.xml中添加域名权限');
     
-    return proxyUrl;
+    return originalUrl;
 }
 
-// 辅助函数：构建发送消息的URL（使用多种代理尝试）
+// 辅助函数：构建发送消息的URL（先尝试直接调用）
 function getChatUrl() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
     
-    // 使用thingproxy（支持更多头部）
-    const proxyUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
-    console.log('🔄 发送消息使用ThingProxy代理:', proxyUrl);
-    console.log('📝 发送消息原始URL:', originalUrl);
+    console.log('🔄 发送消息尝试直接调用GPTBots API:', originalUrl);
+    console.log('📝 已在manifest.xml中添加域名权限');
     
-    return proxyUrl;
+    return originalUrl;
 }
 
-// 辅助函数：使用备用代理重试请求
+// 辅助函数：使用ThingProxy作为备用方案
 function getCreateConversationUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
-    const fallbackUrl = `https://proxy.cors.sh/${originalUrl}`;
-    console.log('🔄 备用代理URL (CORS.SH):', fallbackUrl);
+    const fallbackUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
+    console.log('🔄 备用代理URL (ThingProxy):', fallbackUrl);
     return fallbackUrl;
 }
 
 function getChatUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
-    const fallbackUrl = `https://proxy.cors.sh/${originalUrl}`;
-    console.log('🔄 发送消息备用代理URL (CORS.SH):', fallbackUrl);
+    const fallbackUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
+    console.log('🔄 发送消息备用代理URL (ThingProxy):', fallbackUrl);
     return fallbackUrl;
 }
 

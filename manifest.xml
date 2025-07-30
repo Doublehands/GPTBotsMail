@@ -11,6 +11,10 @@
   <SupportUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/"/>
   <AppDomains>
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
+    <AppDomain>https://api.gptbots.ai</AppDomain>
+    <AppDomain>https://thingproxy.freeboard.io</AppDomain>
+    <AppDomain>https://proxy.cors.sh</AppDomain>
+    <AppDomain>https://api.codetabs.com</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
