@@ -38,7 +38,7 @@ if (typeof Office === 'undefined') {
   console.log('✅ Office.js 已加载，版本:', Office.context ? Office.context.requirements : '未知');
 
   // Office初始化
-  Office.onReady((info) => {
+Office.onReady((info) => {
     console.log('🚀 GPTBots Copilot 开始初始化...', info);
     console.log('📊 Office信息:', {
       host: info.host,
@@ -46,7 +46,7 @@ if (typeof Office === 'undefined') {
       context: Office.context
     });
     
-    if (info.host === Office.HostType.Outlook) {
+  if (info.host === Office.HostType.Outlook) {
       console.log('✅ Outlook 环境检测成功');
       
       try {
@@ -61,8 +61,10 @@ if (typeof Office === 'undefined') {
         });
         
         if (sideloadMsg) sideloadMsg.style.display = "none";
-        if (appBody) appBody.style.display = "flex";
-        if (runButton) runButton.onclick = run;
+        if (appBody) appBody.classList.add('show');
+        
+        // 绑定AI技能按钮事件
+        bindAISkillButtons();
         
         console.log('✅ UI 元素设置完成');
         
@@ -87,6 +89,78 @@ if (typeof Office === 'undefined') {
 }
 
 /**
+ * 绑定AI技能按钮事件
+ */
+function bindAISkillButtons() {
+  const featureItems = document.querySelectorAll('.gptbots-feature-item');
+  
+  featureItems.forEach((item, index) => {
+    item.addEventListener('click', async function() {
+      const skillType = ['translate', 'summary', 'reply'][index];
+      const skillName = ['深度翻译', '生成摘要', '生成回复'][index];
+      
+      console.log(`🎯 用户点击了: ${skillName}`);
+      await processAISkill(skillType, skillName);
+    });
+  });
+
+  // 绑定预览框按钮事件
+  document.getElementById('copy-result').addEventListener('click', copyResult);
+  document.getElementById('use-result').addEventListener('click', useResult);
+  document.getElementById('close-preview').addEventListener('click', closePreview);
+}
+
+/**
+ * 处理AI技能请求
+ */
+async function processAISkill(skillType, skillName) {
+  try {
+    // 显示加载状态
+    showPreviewLoading(skillName);
+    
+    // 1. 读取邮件内容
+    console.log('📧 开始读取邮件内容...');
+    const emailContent = await readEmailContent();
+    if (!emailContent) {
+      showPreviewError('无法读取邮件内容');
+      return;
+    }
+    
+    currentEmailContent = emailContent;
+    
+    // 2. 根据技能类型构建提示词
+    let prompt = '';
+    switch (skillType) {
+      case 'translate':
+        prompt = `请帮我翻译：\n\n${emailContent.body}`;
+        break;
+      case 'summary':
+        prompt = `请生成摘要：\n\n邮件主题: ${emailContent.subject}\n发件人: ${emailContent.from}\n\n邮件内容:\n${emailContent.body}`;
+        break;
+      case 'reply':
+        prompt = `帮我生成回复内容：\n\n原邮件主题: ${emailContent.subject}\n发件人: ${emailContent.from}\n\n原邮件内容:\n${emailContent.body}`;
+        break;
+    }
+    
+    console.log(`💬 发送${skillName}请求...`);
+    
+    // 3. 发送到GPTBots API
+    const response = await sendToGPTBotsAPI(prompt);
+    if (!response.success) {
+      showPreviewError(`${skillName}失败: ${response.error}`);
+      return;
+    }
+    
+    // 4. 显示结果
+    showPreviewResult(response.message, skillType);
+    
+  } catch (error) {
+    console.error(`❌ ${skillName}处理失败:`, error);
+    showPreviewError(`${skillName}处理失败: ${error.message}`);
+  }
+}
+
+/**
  * 初始化用户界面
  */
 function initializeUI() {
@@ -100,36 +174,9 @@ function initializeUI() {
   }
   
   console.log('✅ API配置检查通过:', API_CONFIG.baseUrl);
-  
-  // 添加调试信息到页面
-  addDebugInfo();
 }
 
-/**
- * 添加调试信息
- */
-function addDebugInfo() {
-  const debugInfo = document.createElement('div');
-  debugInfo.id = 'debug-info';
-  debugInfo.style.cssText = 'position: fixed; bottom: 10px; right: 10px; background: #f0f0f0; padding: 10px; font-size: 12px; border-radius: 5px; max-width: 200px; z-index: 1000;';
-  debugInfo.innerHTML = `
-    <strong>调试信息:</strong><br>
-    Host: ${Office.context.host}<br>
-    API: ${API_CONFIG ? '✅' : '❌'}<br>
-    <button onclick="toggleDebugInfo()" style="font-size: 10px; margin-top: 5px;">切换显示</button>
-  `;
-  document.body.appendChild(debugInfo);
-}
 
-/**
- * 切换调试信息显示
- */
-function toggleDebugInfo() {
-  const debugInfo = document.getElementById('debug-info');
-  if (debugInfo) {
-    debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-  }
-}
 
 /**
  * 主要运行函数 - 开始使用按钮点击事件
@@ -215,9 +262,9 @@ async function readEmailContent() {
 }
 
 /**
- * 发送邮件内容到GPTBots API
+ * 发送消息到GPTBots API
  */
-async function sendToGPTBotsAPI(emailContent) {
+async function sendToGPTBotsAPI(message) {
   try {
     // 1. 首先创建对话
     console.log('创建对话...');
@@ -229,23 +276,7 @@ async function sendToGPTBotsAPI(emailContent) {
     currentConversationId = conversationResponse.conversationId;
     console.log('对话创建成功，ID:', currentConversationId);
     
-    // 2. 构建消息内容
-    const message = `请分析以下邮件内容并提供智能建议：
-
-邮件主题: ${emailContent.subject}
-发件人: ${emailContent.from}
-收件人: ${emailContent.to}
-发送时间: ${emailContent.dateTimeCreated}
-
-邮件正文:
-${emailContent.body}
-
-请提供：
-1. 邮件内容摘要
-2. 建议的回复要点
-3. 需要注意的关键信息`;
-
-    // 3. 发送消息
+    // 2. 发送消息
     console.log('发送消息到GPTBots...');
     const chatResponse = await sendChatMessage(currentConversationId, message);
     
@@ -616,9 +647,170 @@ function showSuccess(message) {
   `;
 }
 
+/**
+ * 显示预览框加载状态
+ */
+function showPreviewLoading(skillName) {
+  const preview = document.getElementById('result-preview');
+  const loading = document.getElementById('loading-indicator');
+  const resultText = document.getElementById('result-text');
+  
+  preview.classList.remove('gptbots-hidden');
+  loading.classList.remove('gptbots-hidden');
+  resultText.classList.add('gptbots-hidden');
+  
+  loading.querySelector('p').textContent = `AI正在${skillName}中...`;
+}
+
+/**
+ * 显示预览框错误
+ */
+function showPreviewError(errorMessage) {
+  const preview = document.getElementById('result-preview');
+  const loading = document.getElementById('loading-indicator');
+  const resultText = document.getElementById('result-text');
+  
+  preview.classList.remove('gptbots-hidden');
+  loading.classList.add('gptbots-hidden');
+  resultText.classList.remove('gptbots-hidden');
+  resultText.innerHTML = `
+    <div class="error-message">
+      <i class="ms-Icon ms-Icon--ErrorBadge"></i>
+      <span>${errorMessage}</span>
+    </div>
+  `;
+}
+
+/**
+ * 显示预览框结果
+ */
+function showPreviewResult(result, skillType) {
+  const preview = document.getElementById('result-preview');
+  const loading = document.getElementById('loading-indicator');
+  const resultText = document.getElementById('result-text');
+  
+  preview.classList.remove('gptbots-hidden');
+  loading.classList.add('gptbots-hidden');
+  resultText.classList.remove('gptbots-hidden');
+  
+  // 保存当前结果和类型，供后续操作使用
+  currentApiResponse = result;
+  currentSkillType = skillType;
+  
+  resultText.innerHTML = `
+    <div class="result-content">
+      <div class="result-text-content">${result.replace(/\n/g, '<br>')}</div>
+    </div>
+  `;
+}
+
+/**
+ * 复制结果到剪贴板
+ */
+async function copyResult() {
+  try {
+    if (currentApiResponse) {
+      await navigator.clipboard.writeText(currentApiResponse);
+      
+      // 显示复制成功提示
+      const copyBtn = document.getElementById('copy-result');
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '已复制!';
+      copyBtn.style.backgroundColor = '#107c10';
+      
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.style.backgroundColor = '';
+      }, 2000);
+      
+      console.log('✅ 结果已复制到剪贴板');
+    }
+  } catch (error) {
+    console.error('❌ 复制失败:', error);
+    alert('复制失败，请手动选择并复制内容');
+  }
+}
+
+/**
+ * 使用结果（根据技能类型执行不同操作）
+ */
+async function useResult() {
+  try {
+    if (!currentApiResponse || !currentSkillType) {
+      console.error('❌ 没有可用的结果');
+      return;
+    }
+    
+    switch (currentSkillType) {
+      case 'reply':
+        // 生成回复：创建回复邮件
+        Office.context.mailbox.item.displayReplyForm(currentApiResponse);
+        showSuccess('回复窗口已打开，内容已填入');
+        break;
+        
+      case 'translate':
+      case 'summary':
+        // 翻译和摘要：创建新邮件草稿
+        const subject = currentSkillType === 'translate' ? 
+          `翻译: ${currentEmailContent.subject}` : 
+          `摘要: ${currentEmailContent.subject}`;
+          
+        Office.context.mailbox.displayNewMessageForm({
+          toRecipients: [],
+          subject: subject,
+          htmlBody: currentApiResponse.replace(/\n/g, '<br>')
+        });
+        showSuccess('草稿已创建，请查看Outlook草稿箱');
+        break;
+    }
+    
+    // 关闭预览框
+    closePreview();
+    
+  } catch (error) {
+    console.error('❌ 使用结果失败:', error);
+    alert('操作失败: ' + error.message);
+  }
+}
+
+/**
+ * 关闭预览框
+ */
+function closePreview() {
+  const preview = document.getElementById('result-preview');
+  preview.classList.add('gptbots-hidden');
+  
+  // 清理状态
+  currentApiResponse = null;
+  currentSkillType = null;
+}
+
+/**
+ * 显示成功信息
+ */
+function showSuccess(message) {
+  // 临时显示成功消息
+  const preview = document.getElementById('result-preview');
+  const resultText = document.getElementById('result-text');
+  
+  resultText.innerHTML = `
+    <div class="success-message">
+      <i class="ms-Icon ms-Icon--Completed" style="color: #107c10;"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  // 3秒后自动关闭
+  setTimeout(() => {
+    closePreview();
+  }, 3000);
+}
+
+// 全局变量，保存当前技能类型
+let currentSkillType = null;
+
 // 导出函数以供外部使用
 window.run = run;
-window.toggleDebugInfo = toggleDebugInfo;
 
 // 添加全局调试函数
 window.debugGPTBots = {
