@@ -12,8 +12,6 @@
   <AppDomains>
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
     <AppDomain>https://api.gptbots.ai</AppDomain>
-    <AppDomain>https://api.codetabs.com</AppDomain>
-    <AppDomain>https://cors-proxy.htmldriven.com</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
