@@ -24,33 +24,100 @@
 </head>
 
 <body class="ms-font-m ms-welcome ms-Fabric">
-    <header class="ms-welcome__header ms-bgColor-neutralLighter">
-        <h1 class="ms-font-su">GPTBots Copilot</h1>
+    <!-- GPTBots Logo Header -->
+    <header class="gptbots-header" style="text-align: center; padding: 20px; background: #fff;">
+        <img src="GPTBots.png" alt="GPTBots" style="max-width: 200px; height: auto;" />
     </header>
+    
+    <!-- Main Content -->
     <section id="sideload-msg" class="ms-welcome__main">
         <h2 class="ms-font-xl">Please <a target="_blank" rel="noopener noreferrer" href="https://learn.microsoft.com/office/dev/add-ins/testing/test-debug-office-add-ins#sideload-an-office-add-in-for-testing">sideload</a> your add-in to see app body.</h2>
     </section>
+    
     <main id="app-body" class="ms-welcome__main" style="display: none;">
-        <h2 class="ms-font-xl">智能AI助手，提升您的邮件效率</h2>
-        <ul class="ms-List ms-welcome__features">
-            <li class="ms-ListItem">
-                <i class="ms-Icon ms-Icon--Robot ms-font-xl"></i>
-                <span class="ms-font-m">AI智能回复建议</span>
-            </li>
-            <li class="ms-ListItem">
-                <i class="ms-Icon ms-Icon--Edit ms-font-xl"></i>
-                <span class="ms-font-m">邮件内容优化</span>
-            </li>
-            <li class="ms-ListItem">
-                <i class="ms-Icon ms-Icon--Chat ms-font-xl"></i>
-                <span class="ms-font-m">智能对话助手</span>
-            </li>
-        </ul>
-        <p class="ms-font-l">点击开始按钮开始使用AI功能</p>
-        <div role="button" id="run" class="ms-welcome__action ms-Button ms-Button--hero ms-font-xl">
-            <span class="ms-Button-label">开始使用</span>
+        <!-- AI 技能 Section -->
+        <section class="ai-skills-section" style="padding: 20px;">
+            <h2 class="ms-font-xl" style="color: #323130; margin-bottom: 15px; text-align: center;">AI 技能</h2>
+            <p id="mode-indicator" class="ms-font-s" style="text-align: center; color: #666; margin-bottom: 20px;"></p>
+            
+            <!-- 邮件阅读界面按钮 -->
+            <div id="read-mode-buttons" class="skills-container" style="display: none; flex-direction: column; gap: 12px;">
+                <div role="button" id="deep-translate-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Translate" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">深度翻译</span>
+                    </div>
+                </div>
+                
+                <div role="button" id="generate-summary-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--ReadingMode" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">生成摘要</span>
+                    </div>
+                </div>
+                
+                <div role="button" id="generate-reply-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Reply" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">生成回复</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 邮件编辑界面按钮 -->
+            <div id="compose-mode-buttons" class="skills-container" style="display: none; flex-direction: column; gap: 12px;">
+                <div role="button" id="compose-translate-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Translate" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">深度翻译</span>
+                    </div>
+                </div>
+                
+                <div role="button" id="content-polish-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Edit" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">内容润色</span>
+                    </div>
+                </div>
+                
+                <div role="button" id="compose-reply-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Reply" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">生成回复</span>
+                    </div>
+                </div>
+                
+                <div role="button" id="generate-draft-btn" class="skill-button ms-Button ms-Button--primary" style="width: 100%; padding: 12px; text-align: center;">
+                    <div class="button-content" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="ms-Icon ms-Icon--Draft" style="font-size: 16px;"></i>
+                        <span class="ms-Button-label ms-font-m">生成草稿</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI内容预览框 -->
+        <section id="preview-section" class="preview-section" style="display: none; padding: 0 20px 20px;">
+            <div class="preview-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 class="ms-font-l" style="color: #323130; margin: 0;">AI 内容预览</h3>
+                <div class="preview-actions">
+                    <button id="insert-content-btn" class="ms-Button ms-Button--primary" style="display: none; font-size: 12px; padding: 5px 10px;">
+                        <span class="ms-Button-label">插入内容</span>
+                    </button>
+                    <button id="clear-preview-btn" class="ms-Button" style="font-size: 12px; padding: 5px 10px; margin-left: 5px;">
+                        <span class="ms-Button-label">清空</span>
+                    </button>
+                </div>
+            </div>
+            <div id="preview-content" class="preview-content" style="background: #f8f9fa; border: 1px solid #e1e5e9; border-radius: 5px; padding: 15px; min-height: 150px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; font-size: 14px; color: #323130;">
+                点击上方按钮生成AI内容...
+            </div>
+        </section>
+        
+        <!-- 状态显示区域 -->
+        <div id="status-area" style="padding: 0 20px 20px;">
+            <p><label id="item-subject"></label></p>
         </div>
-        <p><label id="item-subject"></label></p>
     </main>
 </body>
 

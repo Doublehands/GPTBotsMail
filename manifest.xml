@@ -6,11 +6,11 @@
   <DefaultLocale>zh-CN</DefaultLocale>
   <DisplayName DefaultValue="GPTBots Copilot"/>
   <Description DefaultValue="GPTBots AI智能邮件助手"/>
-  <IconUrl DefaultValue="https://YOUR_DOMAIN/assets/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://YOUR_DOMAIN/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://YOUR_DOMAIN/"/>
+  <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
+  <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
+  <SupportUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/"/>
   <AppDomains>
-    <AppDomain>https://YOUR_DOMAIN</AppDomain>
+    <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
@@ -23,85 +23,22 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://YOUR_DOMAIN/src/taskpane/taskpane.html"/>
-        <RequestedHeight>250</RequestedHeight>
+        <SourceLocation DefaultValue="https://doublehands.github.io/GPTBotsMail/src/taskpane/taskpane.html"/>
+        <RequestedHeight>600</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+    <Form xsi:type="ItemEdit">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://doublehands.github.io/GPTBotsMail/src/taskpane/taskpane.html"/>
+        <RequestedHeight>600</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
   <Permissions>ReadWriteItem</Permissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
   </Rule>
   <DisableEntityHighlighting>false</DisableEntityHighlighting>
-  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
-    <Requirements>
-      <bt:Sets DefaultMinVersion="1.3">
-        <bt:Set Name="Mailbox"/>
-      </bt:Sets>
-    </Requirements>
-    <Hosts>
-      <Host xsi:type="MailHost">
-        <DesktopFormFactor>
-          <FunctionFile resid="Commands.Url"/>
-          <ExtensionPoint xsi:type="MessageReadCommandSurface">
-            <OfficeTab id="TabDefault">
-              <Group id="msgReadGroup">
-                <Label resid="GroupLabel"/>
-                <Control xsi:type="Button" id="msgReadOpenPaneButton">
-                  <Label resid="TaskpaneButton.Label"/>
-                  <Supertip>
-                    <Title resid="TaskpaneButton.Label"/>
-                    <Description resid="TaskpaneButton.Tooltip"/>
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.16x16"/>
-                    <bt:Image size="32" resid="Icon.32x32"/>
-                    <bt:Image size="80" resid="Icon.80x80"/>
-                  </Icon>
-                  <Action xsi:type="ShowTaskpane">
-                    <SourceLocation resid="Taskpane.Url"/>
-                  </Action>
-                </Control>
-                <Control xsi:type="Button" id="ActionButton">
-                  <Label resid="ActionButton.Label"/>
-                  <Supertip>
-                    <Title resid="ActionButton.Label"/>
-                    <Description resid="ActionButton.Tooltip"/>
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.16x16"/>
-                    <bt:Image size="32" resid="Icon.32x32"/>
-                    <bt:Image size="80" resid="Icon.80x80"/>
-                  </Icon>
-                  <Action xsi:type="ExecuteFunction">
-                    <FunctionName>action</FunctionName>
-                  </Action>
-                </Control>
-              </Group>
-            </OfficeTab>
-          </ExtensionPoint>
-        </DesktopFormFactor>
-      </Host>
-    </Hosts>
-    <Resources>
-      <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://YOUR_DOMAIN/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://YOUR_DOMAIN/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://YOUR_DOMAIN/assets/icon-80.png"/>
-      </bt:Images>
-      <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://YOUR_DOMAIN/src/commands/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://YOUR_DOMAIN/src/taskpane/taskpane.html"/>
-      </bt:Urls>
-      <bt:ShortStrings>
-        <bt:String id="GroupLabel" DefaultValue="GPTBots Copilot"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="AI智能助手"/>
-        <bt:String id="ActionButton.Label" DefaultValue="快速分析"/>
-      </bt:ShortStrings>
-      <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="打开GPTBots AI智能邮件助手"/>
-        <bt:String id="ActionButton.Tooltip" DefaultValue="快速分析当前邮件内容"/>
-      </bt:LongStrings>
-    </Resources>
-  </VersionOverrides>
+
 </OfficeApp>
