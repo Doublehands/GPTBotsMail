@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="MailApp">
   <Id>f8129f5e-0786-4e1d-bf8e-defa4ca74081</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>GPTBots</ProviderName>
-  <DefaultLocale>zh-CN</DefaultLocale>
+  <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="GPTBots Copilot"/>
   <Description DefaultValue="GPTBots AI智能邮件助手"/>
   <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
   <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
   <SupportUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/"/>
   <AppDomains>
-    <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
+    <AppDomain>https://doublehands.github.io</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
@@ -24,6 +24,7 @@
     <Form xsi:type="ItemRead">
       <DesktopSettings>
         <SourceLocation DefaultValue="https://doublehands.github.io/GPTBotsMail/src/taskpane/taskpane.html"/>
+        <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
