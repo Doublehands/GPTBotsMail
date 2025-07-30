@@ -1086,6 +1086,11 @@ window.debugGPTBots = {
   }
 };
 
+// 显示代理状态
+console.log('🔍 代理状态检查:');
+console.log('  创建对话URL:', getCreateConversationUrl());
+console.log('  发送消息URL:', getChatUrl());
+
 console.log('🔧 调试工具已加载! 使用方法:');
 console.log('  debugGPTBots.testConnection() - 测试API和CORS代理连通性');
 console.log('  debugGPTBots.testAPI() - 完整API功能测试（含代理重试）');
@@ -1093,10 +1098,10 @@ console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
 console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
 console.log('');
-console.log('🛠️ CORS解决方案已启用：');
-console.log('  - 主要代理: api.allorigins.win');
-console.log('  - 备用代理: corsproxy.io');
-console.log('  - 自动重试机制：主要代理失败时自动尝试备用代理');
+console.log('🛠️ CORS解决方案已强制启用：');
+console.log('  - 主要代理: api.allorigins.win（强制使用）');
+console.log('  - 备用代理: corsproxy.io（自动重试）');
+console.log('  - 强制代理模式：所有API请求必须通过代理');
 console.log('  - 增强错误处理：显示详细错误信息');
 console.log('');
-console.log('💡 直接调用失败，已启用CORS代理解决方案');
+console.log('💡 已修复代理配置问题，强制使用CORS代理');

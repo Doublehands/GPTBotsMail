@@ -128,37 +128,43 @@ function getNestedValue(obj, path) {
     }, obj);
 }
 
-// 辅助函数：构建创建对话的URL
+// 辅助函数：构建创建对话的URL（强制使用代理）
 function getCreateConversationUrl() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
     
-    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
-        return `${API_CONFIG.corsProxy.primary}${encodeURIComponent(originalUrl)}`;
-    }
+    // 强制使用CORS代理
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 强制使用代理URL:', proxyUrl);
+    console.log('📝 原始URL:', originalUrl);
     
-    return originalUrl;
+    return proxyUrl;
 }
 
-// 辅助函数：构建发送消息的URL
+// 辅助函数：构建发送消息的URL（强制使用代理）
 function getChatUrl() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
     
-    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
-        return `${API_CONFIG.corsProxy.primary}${encodeURIComponent(originalUrl)}`;
-    }
+    // 强制使用CORS代理
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 发送消息强制使用代理URL:', proxyUrl);
+    console.log('📝 发送消息原始URL:', originalUrl);
     
-    return originalUrl;
+    return proxyUrl;
 }
 
 // 辅助函数：使用备用代理重试请求
 function getCreateConversationUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
-    return `${API_CONFIG.corsProxy.fallback}${encodeURIComponent(originalUrl)}`;
+    const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 备用代理URL:', fallbackUrl);
+    return fallbackUrl;
 }
 
 function getChatUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
-    return `${API_CONFIG.corsProxy.fallback}${encodeURIComponent(originalUrl)}`;
+    const fallbackUrl = `https://corsproxy.io/?${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 发送消息备用代理URL:', fallbackUrl);
+    return fallbackUrl;
 }
 
 // 辅助函数：构建创建对话的请求数据
