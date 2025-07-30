@@ -12,6 +12,7 @@
   <AppDomains>
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
     <AppDomain>https://api.gptbots.ai</AppDomain>
+    <AppDomain>https://cors.io</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>

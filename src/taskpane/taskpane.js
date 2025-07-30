@@ -353,7 +353,8 @@ async function createConversation() {
     const url = getCreateConversationUrl();
     const data = buildCreateConversationData();
     
-    console.log('📞 API请求:', { url, method: 'POST', data });
+    console.log('📞 API请求 (通过CORS代理):', { url, method: 'POST', data });
+    console.log('🔧 使用cors.io代理解决CORS问题');
     
     const response = await fetch(url, {
       method: 'POST',
@@ -389,7 +390,8 @@ async function sendChatMessage(conversationId, message) {
     const url = getChatUrl();
     const data = buildChatMessageData(conversationId, message);
     
-    console.log('📞 API请求:', { url, method: 'POST', data });
+    console.log('📞 API请求 (通过CORS代理):', { url, method: 'POST', data });
+    console.log('🔧 使用cors.io代理解决CORS问题');
     
     const response = await fetch(url, {
       method: 'POST',

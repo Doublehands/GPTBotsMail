@@ -42,14 +42,18 @@ function buildChatMessageData(conversationId, message) {
     };
 }
 
-// 获取创建对话的完整URL
+// 获取创建对话的完整URL（使用代理解决CORS）
 function getCreateConversationUrl() {
-    return API_CONFIG.baseUrl + API_CONFIG.createConversationEndpoint;
+    const originalUrl = API_CONFIG.baseUrl + API_CONFIG.createConversationEndpoint;
+    // 使用cors.io代理解决CORS问题（支持所有HTTP头）
+    return `https://cors.io/?${originalUrl}`;
 }
 
-// 获取发送消息的完整URL
+// 获取发送消息的完整URL（使用代理解决CORS）
 function getChatUrl() {
-    return API_CONFIG.baseUrl + API_CONFIG.chatEndpoint;
+    const originalUrl = API_CONFIG.baseUrl + API_CONFIG.chatEndpoint;
+    // 使用cors.io代理解决CORS问题（支持所有HTTP头）
+    return `https://cors.io/?${originalUrl}`;
 }
 
 // 解析创建对话的响应
