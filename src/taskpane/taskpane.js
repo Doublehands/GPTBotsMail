@@ -115,20 +115,29 @@ function bindAISkillButtons() {
  */
 async function processAISkill(skillType, skillName) {
   try {
+    console.log(`🎯 开始处理${skillName}请求...`);
+    
     // 显示加载状态
     showPreviewLoading(skillName);
     
     // 1. 读取邮件内容
-    console.log('📧 开始读取邮件内容...');
+    console.log('📧 第1步：读取邮件内容...');
     const emailContent = await readEmailContent();
     if (!emailContent) {
+      console.error('❌ 第1步失败：无法读取邮件内容');
       showPreviewError('无法读取邮件内容');
       return;
     }
     
+    console.log('✅ 第1步成功：邮件内容读取完成', {
+      subject: emailContent.subject,
+      bodyLength: emailContent.body.length
+    });
+    
     currentEmailContent = emailContent;
     
     // 2. 根据技能类型构建提示词
+    console.log(`📝 第2步：构建${skillName}提示词...`);
     let prompt = '';
     switch (skillType) {
       case 'translate':
@@ -142,20 +151,41 @@ async function processAISkill(skillType, skillName) {
         break;
     }
     
-    console.log(`💬 发送${skillName}请求...`);
+    console.log(`✅ 第2步成功：提示词构建完成`, {
+      skillType: skillType,
+      promptLength: prompt.length,
+      promptPreview: prompt.substring(0, 100) + '...'
+    });
     
     // 3. 发送到GPTBots API
+    console.log(`🚀 第3步：发送到GPTBots API...`);
     const response = await sendToGPTBotsAPI(prompt);
+    
     if (!response.success) {
+      console.error(`❌ 第3步失败：API调用失败`, {
+        error: response.error,
+        originalError: response.originalError
+      });
       showPreviewError(`${skillName}失败: ${response.error}`);
       return;
     }
     
+    console.log(`✅ 第3步成功：API调用完成`, {
+      responseLength: response.message ? response.message.length : 0,
+      responsePreview: response.message ? response.message.substring(0, 100) + '...' : '无内容'
+    });
+    
     // 4. 显示结果
+    console.log(`🎨 第4步：显示结果...`);
     showPreviewResult(response.message, skillType);
+    console.log(`✅ 第4步成功：${skillName}处理完成`);
     
   } catch (error) {
-    console.error(`❌ ${skillName}处理失败:`, error);
+    console.error(`❌ ${skillName}处理过程中发生异常:`, {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     showPreviewError(`${skillName}处理失败: ${error.message}`);
   }
 }
@@ -266,27 +296,50 @@ async function readEmailContent() {
  */
 async function sendToGPTBotsAPI(message) {
   try {
+    console.log('🔄 开始GPTBots API调用流程...');
+    
     // 1. 首先创建对话
-    console.log('创建对话...');
+    console.log('📞 第3.1步：创建对话...');
     const conversationResponse = await createConversation();
     if (!conversationResponse.success) {
+      console.error('❌ 第3.1步失败：创建对话失败', conversationResponse);
       return conversationResponse;
     }
     
     currentConversationId = conversationResponse.conversationId;
-    console.log('对话创建成功，ID:', currentConversationId);
+    console.log('✅ 第3.1步成功：对话创建成功', {
+      conversationId: currentConversationId
+    });
     
     // 2. 发送消息
-    console.log('发送消息到GPTBots...');
+    console.log('💬 第3.2步：发送消息到GPTBots...');
+    console.log('📝 消息内容预览:', {
+      messageLength: message.length,
+      messagePreview: message.substring(0, 200) + '...'
+    });
+    
     const chatResponse = await sendChatMessage(currentConversationId, message);
+    
+    if (chatResponse.success) {
+      console.log('✅ 第3.2步成功：消息发送成功', {
+        responseLength: chatResponse.message ? chatResponse.message.length : 0
+      });
+    } else {
+      console.error('❌ 第3.2步失败：消息发送失败', chatResponse);
+    }
     
     return chatResponse;
     
   } catch (error) {
-    console.error('GPTBots API调用失败:', error);
+    console.error('❌ GPTBots API调用过程中发生异常:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     return {
       success: false,
-      error: error.message || '未知错误'
+      error: error.message || '未知错误',
+      originalError: error.message
     };
   }
 }
@@ -320,13 +373,20 @@ async function createConversationWithUrl(url, proxyName) {
       data: data
     });
 
-    // 配置fetch选项
+    // 配置fetch选项（尝试多种CORS配置）
     const fetchOptions = {
       method: 'POST',
-      headers: API_CONFIG.headers,
+      headers: {
+        ...API_CONFIG.headers,
+        // 尝试添加一些可能有用的头
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
       body: JSON.stringify(data),
-      mode: 'cors',
-      credentials: 'omit'
+      mode: 'cors', // 尝试CORS模式
+      credentials: 'omit',
+      cache: 'no-cache',
+      referrer: 'no-referrer'
     };
 
     console.log(`🌐 ${proxyName} - Fetch选项:`, fetchOptions);
@@ -411,13 +471,20 @@ async function sendChatMessageWithUrl(url, conversationId, message, proxyName) {
       data: data
     });
 
-    // 配置fetch选项
+    // 配置fetch选项（尝试多种CORS配置）
     const fetchOptions = {
       method: 'POST',
-      headers: API_CONFIG.headers,
+      headers: {
+        ...API_CONFIG.headers,
+        // 尝试添加一些可能有用的头
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      },
       body: JSON.stringify(data),
-      mode: 'cors',
-      credentials: 'omit'
+      mode: 'cors', // 尝试CORS模式
+      credentials: 'omit',
+      cache: 'no-cache',
+      referrer: 'no-referrer'
     };
     
     const response = await fetch(url, fetchOptions);
@@ -1017,9 +1084,9 @@ console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
 console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
 console.log('');
-console.log('🛠️ CORS解决方案已启用：');
-console.log('  - 主要代理: api.allorigins.win');
-console.log('  - 备用代理: corsproxy.io');
-console.log('  - 自动重试机制：主要代理失败时自动尝试备用代理');
+console.log('🧪 CORS测试模式已启用：');
+console.log('  - 正在测试直接调用GPTBots API（无代理）');
+console.log('  - 如果成功，说明不需要代理');
+console.log('  - 如果失败，我们将启用CORS代理');
 console.log('');
-console.log('💡 如果仍遇到问题，请先运行 debugGPTBots.testConnection()');
+console.log('💡 当前配置: 代理已禁用，测试直接调用');
