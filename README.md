@@ -1,0 +1,2 @@
+# GPTBotsMail
+GPTBotsOutlook
