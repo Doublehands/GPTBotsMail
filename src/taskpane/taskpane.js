@@ -10,30 +10,81 @@ let currentConversationId = null;
 let currentEmailContent = null;
 let currentApiResponse = null;
 
-// Office初始化
-Office.onReady((info) => {
-  console.log('🚀 GPTBots Copilot 开始初始化...', info);
-  
-  if (info.host === Office.HostType.Outlook) {
-    console.log('✅ Outlook 环境检测成功');
-    
-    try {
-    document.getElementById("sideload-msg").style.display = "none";
-    document.getElementById("app-body").style.display = "flex";
-    document.getElementById("run").onclick = run;
-      console.log('✅ UI 元素绑定成功');
-      
-      // 初始化界面
-      initializeUI();
-    } catch (error) {
-      console.error('❌ UI 初始化失败:', error);
-      showError('界面初始化失败: ' + error.message);
-    }
-  } else {
-    console.warn('⚠️ 非Outlook环境:', info.host);
-    showError(`不支持的Office应用: ${info.host}`);
-  }
+// 添加全局错误处理
+window.addEventListener('error', function(e) {
+  console.error('🚨 全局JavaScript错误:', e.error);
+  document.getElementById("sideload-msg").innerHTML = `
+    <h2>JavaScript错误:</h2>
+    <p>${e.error.message}</p>
+    <p>文件: ${e.filename}</p>
+    <p>行号: ${e.lineno}</p>
+  `;
 });
+
+// 检查Office是否可用
+console.log('🔍 检查Office对象:', typeof Office !== 'undefined' ? '✅ 可用' : '❌ 不可用');
+
+// 如果Office不可用，直接显示错误
+if (typeof Office === 'undefined') {
+  console.error('❌ Office.js 未加载');
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("sideload-msg").innerHTML = `
+      <h2>Office.js 未加载</h2>
+      <p>请检查网络连接和Office环境</p>
+      <button onclick="location.reload()">重新加载</button>
+    `;
+  });
+} else {
+  console.log('✅ Office.js 已加载，版本:', Office.context ? Office.context.requirements : '未知');
+
+  // Office初始化
+  Office.onReady((info) => {
+    console.log('🚀 GPTBots Copilot 开始初始化...', info);
+    console.log('📊 Office信息:', {
+      host: info.host,
+      platform: info.platform,
+      context: Office.context
+    });
+    
+    if (info.host === Office.HostType.Outlook) {
+      console.log('✅ Outlook 环境检测成功');
+      
+      try {
+        const sideloadMsg = document.getElementById("sideload-msg");
+        const appBody = document.getElementById("app-body");
+        const runButton = document.getElementById("run");
+        
+        console.log('🔍 DOM元素检查:', {
+          sideloadMsg: sideloadMsg ? '✅' : '❌',
+          appBody: appBody ? '✅' : '❌', 
+          runButton: runButton ? '✅' : '❌'
+        });
+        
+        if (sideloadMsg) sideloadMsg.style.display = "none";
+        if (appBody) appBody.style.display = "flex";
+        if (runButton) runButton.onclick = run;
+        
+        console.log('✅ UI 元素设置完成');
+        
+        // 初始化界面
+        initializeUI();
+      } catch (error) {
+        console.error('❌ UI 初始化失败:', error);
+        showError('界面初始化失败: ' + error.message);
+      }
+    } else {
+      console.warn('⚠️ 非Outlook环境:', info.host);
+      showError(`不支持的Office应用: ${info.host || '未知'}`);
+    }
+  }).catch(error => {
+    console.error('❌ Office.onReady 失败:', error);
+    document.getElementById("sideload-msg").innerHTML = `
+      <h2>Office初始化失败</h2>
+      <p>${error.message}</p>
+      <button onclick="location.reload()">重新加载</button>
+    `;
+  });
+}
 
 /**
  * 初始化用户界面
