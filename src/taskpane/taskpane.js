@@ -415,8 +415,12 @@ async function createConversationWithUrl(url, proxyName) {
       name: error.name,
       message: error.message,
       stack: error.stack,
-      cause: error.cause
+      cause: error.cause,
+      toString: error.toString()
     });
+    
+    // 额外输出完整错误对象
+    console.error(`❌ ${proxyName} - 完整错误对象:`, error);
     
     // 根据错误类型提供更有用的错误信息
     let userFriendlyError = '';
@@ -510,8 +514,13 @@ async function sendChatMessageWithUrl(url, conversationId, message, proxyName) {
     console.error(`❌ ${proxyName} - 发送消息失败:`, {
       name: error.name,
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      cause: error.cause,
+      toString: error.toString()
     });
+    
+    // 额外输出完整错误对象
+    console.error(`❌ ${proxyName} - 完整错误对象:`, error);
     
     // 根据错误类型提供更有用的错误信息
     let userFriendlyError = '';
@@ -1084,9 +1093,10 @@ console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
 console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
 console.log('');
-console.log('🧪 CORS测试模式已启用：');
-console.log('  - 正在测试直接调用GPTBots API（无代理）');
-console.log('  - 如果成功，说明不需要代理');
-console.log('  - 如果失败，我们将启用CORS代理');
+console.log('🛠️ CORS解决方案已启用：');
+console.log('  - 主要代理: api.allorigins.win');
+console.log('  - 备用代理: corsproxy.io');
+console.log('  - 自动重试机制：主要代理失败时自动尝试备用代理');
+console.log('  - 增强错误处理：显示详细错误信息');
 console.log('');
-console.log('💡 当前配置: 代理已禁用，测试直接调用');
+console.log('💡 直接调用失败，已启用CORS代理解决方案');

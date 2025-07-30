@@ -15,7 +15,7 @@ const API_CONFIG = {
         // 备用代理服务
         fallback: 'https://corsproxy.io/?',
         // 是否启用代理
-        enabled: false // 暂时禁用，测试直接调用
+        enabled: true // 直接调用失败，启用CORS代理
     },
     
     // 创建对话端点
