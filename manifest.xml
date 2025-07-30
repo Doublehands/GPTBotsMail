@@ -3,11 +3,11 @@
   <Id>f8129f5e-0786-4e1d-bf8e-defa4ca74081</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>GPTBots</ProviderName>
-  <DefaultLocale>zh-CN</DefaultLocale>
+  <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="GPTBots Copilot"/>
-  <Description DefaultValue="GPTBots AI智能邮件助手"/>
-  <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
-  <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
+  <Description DefaultValue="GPTBots AI Email Assistant"/>
+  <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/"/>
   <AppDomains>
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
@@ -31,5 +31,4 @@
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
-  <DisableEntityHighlighting>false</DisableEntityHighlighting>
 </OfficeApp>
