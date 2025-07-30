@@ -151,15 +151,17 @@ function getChatUrl() {
 // 辅助函数：使用ThingProxy作为备用方案
 function getCreateConversationUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
-    const fallbackUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
-    console.log('🔄 备用代理URL (ThingProxy):', fallbackUrl);
+    const fallbackUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 备用代理URL (CodeTabs):', fallbackUrl);
+    console.log('📝 CodeTabs支持POST请求和Authorization头');
     return fallbackUrl;
 }
 
 function getChatUrlFallback() {
     const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
-    const fallbackUrl = `https://thingproxy.freeboard.io/fetch/${originalUrl}`;
-    console.log('🔄 发送消息备用代理URL (ThingProxy):', fallbackUrl);
+    const fallbackUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(originalUrl)}`;
+    console.log('🔄 发送消息备用代理URL (CodeTabs):', fallbackUrl);
+    console.log('📝 CodeTabs支持POST请求和Authorization头');
     return fallbackUrl;
 }
 

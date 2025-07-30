@@ -352,15 +352,15 @@ async function createConversation() {
   const result = await createConversationWithUrl(getCreateConversationUrl(), '直接调用GPTBots');
   
   if (!result.success) {
-    console.log('🔄 直接调用失败，尝试ThingProxy代理...');
-    const fallbackResult = await createConversationWithUrl(getCreateConversationUrlFallback(), 'ThingProxy代理');
+    console.log('🔄 直接调用失败，尝试CodeTabs代理...');
+    const fallbackResult = await createConversationWithUrl(getCreateConversationUrlFallback(), 'CodeTabs代理');
     
     if (!fallbackResult.success) {
-      console.log('🔄 ThingProxy失败，尝试最后方案...');
-      // 最后尝试一个不同的代理格式
+      console.log('🔄 CodeTabs失败，尝试最后方案...');
+      // 最后尝试 cors-proxy.htmldriven.com
       const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
-      const lastResortUrl = `https://proxy.cors.sh/${originalUrl}`;
-      return await createConversationWithUrl(lastResortUrl, 'CORS.SH代理');
+      const lastResortUrl = `https://cors-proxy.htmldriven.com/${originalUrl}`;
+      return await createConversationWithUrl(lastResortUrl, 'HTMLDriven代理');
     }
     
     return fallbackResult;
@@ -457,15 +457,15 @@ async function sendChatMessage(conversationId, message) {
   const result = await sendChatMessageWithUrl(getChatUrl(), conversationId, message, '直接调用GPTBots');
   
   if (!result.success) {
-    console.log('🔄 直接调用失败，尝试ThingProxy代理...');
-    const fallbackResult = await sendChatMessageWithUrl(getChatUrlFallback(), conversationId, message, 'ThingProxy代理');
+    console.log('🔄 直接调用失败，尝试CodeTabs代理...');
+    const fallbackResult = await sendChatMessageWithUrl(getChatUrlFallback(), conversationId, message, 'CodeTabs代理');
     
     if (!fallbackResult.success) {
-      console.log('🔄 ThingProxy失败，尝试最后方案...');
-      // 最后尝试一个不同的代理格式
+      console.log('🔄 CodeTabs失败，尝试最后方案...');
+      // 最后尝试 cors-proxy.htmldriven.com
       const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
-      const lastResortUrl = `https://proxy.cors.sh/${originalUrl}`;
-      return await sendChatMessageWithUrl(lastResortUrl, conversationId, message, 'CORS.SH代理');
+      const lastResortUrl = `https://cors-proxy.htmldriven.com/${originalUrl}`;
+      return await sendChatMessageWithUrl(lastResortUrl, conversationId, message, 'HTMLDriven代理');
     }
     
     return fallbackResult;
