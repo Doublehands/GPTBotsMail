@@ -8,6 +8,16 @@ const API_CONFIG = {
     // GPTBots API基础URL
     baseUrl: 'https://api.gptbots.ai',
     
+    // CORS代理配置（用于解决跨域问题）
+    corsProxy: {
+        // 主要代理服务
+        primary: 'https://api.allorigins.win/raw?url=',
+        // 备用代理服务
+        fallback: 'https://corsproxy.io/?',
+        // 是否启用代理
+        enabled: true
+    },
+    
     // 创建对话端点
     createConversationEndpoint: '/v1/conversation',
     
@@ -120,12 +130,35 @@ function getNestedValue(obj, path) {
 
 // 辅助函数：构建创建对话的URL
 function getCreateConversationUrl() {
-    return `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
+    const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
+    
+    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
+        return `${API_CONFIG.corsProxy.primary}${encodeURIComponent(originalUrl)}`;
+    }
+    
+    return originalUrl;
 }
 
 // 辅助函数：构建发送消息的URL
 function getChatUrl() {
-    return `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
+    const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
+    
+    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
+        return `${API_CONFIG.corsProxy.primary}${encodeURIComponent(originalUrl)}`;
+    }
+    
+    return originalUrl;
+}
+
+// 辅助函数：使用备用代理重试请求
+function getCreateConversationUrlFallback() {
+    const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`;
+    return `${API_CONFIG.corsProxy.fallback}${encodeURIComponent(originalUrl)}`;
+}
+
+function getChatUrlFallback() {
+    const originalUrl = `${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`;
+    return `${API_CONFIG.corsProxy.fallback}${encodeURIComponent(originalUrl)}`;
 }
 
 // 辅助函数：构建创建对话的请求数据
@@ -236,6 +269,8 @@ if (typeof module !== 'undefined' && module.exports) {
     window.applyPreset = applyPreset;
     window.getCreateConversationUrl = getCreateConversationUrl;
     window.getChatUrl = getChatUrl;
+    window.getCreateConversationUrlFallback = getCreateConversationUrlFallback;
+    window.getChatUrlFallback = getChatUrlFallback;
     window.buildCreateConversationData = buildCreateConversationData;
     window.buildChatRequestData = buildChatRequestData;
     window.parseCreateConversationResponse = parseCreateConversationResponse;

@@ -292,14 +292,28 @@ async function sendToGPTBotsAPI(message) {
 }
 
 /**
- * 创建对话
+ * 创建对话（支持代理重试）
  */
 async function createConversation() {
+  // 尝试主要代理
+  const result = await createConversationWithUrl(getCreateConversationUrl(), '主要代理');
+  
+  if (!result.success && API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
+    console.log('🔄 主要代理失败，尝试备用代理...');
+    return await createConversationWithUrl(getCreateConversationUrlFallback(), '备用代理');
+  }
+  
+  return result;
+}
+
+/**
+ * 使用指定URL创建对话
+ */
+async function createConversationWithUrl(url, proxyName) {
   try {
-    const url = getCreateConversationUrl();
     const data = buildCreateConversationData();
     
-    console.log('🔗 创建对话请求:', {
+    console.log(`🔗 ${proxyName} - 创建对话请求:`, {
       url: url,
       method: 'POST',
       headers: API_CONFIG.headers,
@@ -311,33 +325,33 @@ async function createConversation() {
       method: 'POST',
       headers: API_CONFIG.headers,
       body: JSON.stringify(data),
-      mode: 'cors', // 明确指定CORS模式
-      credentials: 'omit' // 不发送凭据
+      mode: 'cors',
+      credentials: 'omit'
     };
 
-    console.log('🌐 Fetch选项:', fetchOptions);
+    console.log(`🌐 ${proxyName} - Fetch选项:`, fetchOptions);
     
     const response = await fetch(url, fetchOptions);
     
-    console.log('📡 HTTP响应状态:', response.status, response.statusText);
-    console.log('📡 响应头:', [...response.headers.entries()]);
+    console.log(`📡 ${proxyName} - HTTP响应状态:`, response.status, response.statusText);
+    console.log(`📡 ${proxyName} - 响应头:`, [...response.headers.entries()]);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ HTTP错误响应内容:', errorText);
+      console.error(`❌ ${proxyName} - HTTP错误响应内容:`, errorText);
       throw new Error(`HTTP错误: ${response.status} - ${response.statusText}\n响应内容: ${errorText}`);
     }
     
     const result = await response.json();
-    console.log('✅ 创建对话响应:', result);
+    console.log(`✅ ${proxyName} - 创建对话响应:`, result);
     
     const parsed = parseCreateConversationResponse(result);
-    console.log('🔍 解析后的对话结果:', parsed);
+    console.log(`🔍 ${proxyName} - 解析后的对话结果:`, parsed);
     
     return parsed;
     
   } catch (error) {
-    console.error('❌ 创建对话失败 - 详细错误:', {
+    console.error(`❌ ${proxyName} - 创建对话失败:`, {
       name: error.name,
       message: error.message,
       stack: error.stack,
@@ -347,13 +361,13 @@ async function createConversation() {
     // 根据错误类型提供更有用的错误信息
     let userFriendlyError = '';
     if (error.message.includes('Failed to fetch')) {
-      userFriendlyError = '网络连接失败，可能是CORS跨域问题或网络不可达。请检查网络连接或联系管理员。';
+      userFriendlyError = `${proxyName}失败: 网络连接失败，可能是CORS跨域问题或网络不可达`;
     } else if (error.message.includes('NetworkError')) {
-      userFriendlyError = '网络错误，请检查您的网络连接。';
+      userFriendlyError = `${proxyName}失败: 网络错误，请检查您的网络连接`;
     } else if (error.message.includes('TypeError')) {
-      userFriendlyError = '请求配置错误，请检查API配置。';
+      userFriendlyError = `${proxyName}失败: 请求配置错误`;
     } else {
-      userFriendlyError = error.message || '创建对话失败';
+      userFriendlyError = `${proxyName}失败: ${error.message || '创建对话失败'}`;
     }
     
     return {
@@ -365,18 +379,32 @@ async function createConversation() {
 }
 
 /**
- * 发送聊天消息
+ * 发送聊天消息（支持代理重试）
  */
 async function sendChatMessage(conversationId, message) {
+  // 尝试主要代理
+  const result = await sendChatMessageWithUrl(getChatUrl(), conversationId, message, '主要代理');
+  
+  if (!result.success && API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
+    console.log('🔄 主要代理失败，尝试备用代理...');
+    return await sendChatMessageWithUrl(getChatUrlFallback(), conversationId, message, '备用代理');
+  }
+  
+  return result;
+}
+
+/**
+ * 使用指定URL发送聊天消息
+ */
+async function sendChatMessageWithUrl(url, conversationId, message, proxyName) {
   try {
-    const url = getChatUrl();
     const messages = [{
       role: 'user',
       content: message
     }];
     const data = buildChatRequestData(conversationId, messages);
     
-    console.log('💬 发送消息请求:', {
+    console.log(`💬 ${proxyName} - 发送消息请求:`, {
       url: url,
       conversationId: conversationId,
       messageLength: message.length,
@@ -394,25 +422,25 @@ async function sendChatMessage(conversationId, message) {
     
     const response = await fetch(url, fetchOptions);
     
-    console.log('📡 消息HTTP响应状态:', response.status, response.statusText);
-    console.log('📡 响应头:', [...response.headers.entries()]);
+    console.log(`📡 ${proxyName} - HTTP响应状态:`, response.status, response.statusText);
+    console.log(`📡 ${proxyName} - 响应头:`, [...response.headers.entries()]);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ 消息HTTP错误响应内容:', errorText);
+      console.error(`❌ ${proxyName} - HTTP错误响应内容:`, errorText);
       throw new Error(`HTTP错误: ${response.status} - ${response.statusText}\n响应内容: ${errorText}`);
     }
     
     const result = await response.json();
-    console.log('✅ 消息API响应:', result);
+    console.log(`✅ ${proxyName} - 消息API响应:`, result);
     
     const parsed = parseChatResponse(result);
-    console.log('🔍 解析后的消息结果:', parsed);
+    console.log(`🔍 ${proxyName} - 解析后的消息结果:`, parsed);
     
     return parsed;
     
   } catch (error) {
-    console.error('❌ 发送消息失败 - 详细错误:', {
+    console.error(`❌ ${proxyName} - 发送消息失败:`, {
       name: error.name,
       message: error.message,
       stack: error.stack
@@ -421,11 +449,11 @@ async function sendChatMessage(conversationId, message) {
     // 根据错误类型提供更有用的错误信息
     let userFriendlyError = '';
     if (error.message.includes('Failed to fetch')) {
-      userFriendlyError = '网络连接失败，可能是CORS跨域问题或API服务器不可达。';
+      userFriendlyError = `${proxyName}失败: 网络连接失败，可能是CORS跨域问题或API服务器不可达`;
     } else if (error.message.includes('NetworkError')) {
-      userFriendlyError = '网络错误，请检查您的网络连接。';
+      userFriendlyError = `${proxyName}失败: 网络错误，请检查您的网络连接`;
     } else {
-      userFriendlyError = error.message || '发送消息失败';
+      userFriendlyError = `${proxyName}失败: ${error.message || '发送消息失败'}`;
     }
     
     return {
@@ -879,28 +907,78 @@ window.debugGPTBots = {
   },
   
   testConnection: async function() {
-    console.log('🌐 测试API连接...');
+    console.log('🌐 测试API连接和代理...');
+    
+    // 测试原始API连接
     try {
-      // 简单的连通性测试
-      const url = API_CONFIG.baseUrl;
-      console.log('测试URL:', url);
+      const originalUrl = API_CONFIG.baseUrl;
+      console.log('🔗 测试原始API URL:', originalUrl);
       
-      const response = await fetch(url, {
+      const response = await fetch(originalUrl, {
         method: 'GET',
-        mode: 'no-cors' // 使用no-cors模式避免CORS问题
+        mode: 'no-cors'
       });
       
-      console.log('连接测试结果:', response);
-      console.log('Response type:', response.type);
-      console.log('Response status:', response.status);
+      console.log('📡 原始API响应:', response);
+      console.log('📡 响应类型:', response.type);
+      console.log('📡 响应状态:', response.status);
       
       if (response.type === 'opaque') {
-        console.log('✅ 服务器可达，但响应被CORS策略阻止（这是正常的）');
+        console.log('✅ 原始API服务器可达，但被CORS策略阻止（这是正常的）');
       }
       
     } catch (error) {
-      console.error('❌ 连接测试失败:', error);
+      console.error('❌ 原始API连接测试失败:', error);
     }
+    
+    // 测试代理连接
+    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
+      console.log('🔄 测试CORS代理...');
+      
+      // 测试主要代理
+      try {
+        const proxyUrl = getCreateConversationUrl();
+        console.log('🔗 测试主要代理URL:', proxyUrl);
+        
+        // 只测试连通性，不发送实际请求
+        const testUrl = `${API_CONFIG.corsProxy.primary}${encodeURIComponent('https://httpbin.org/get')}`;
+        const response = await fetch(testUrl, {
+          method: 'GET',
+          mode: 'cors'
+        });
+        
+        console.log('📡 主要代理响应状态:', response.status);
+        if (response.ok) {
+          console.log('✅ 主要代理工作正常');
+        }
+        
+      } catch (error) {
+        console.error('❌ 主要代理测试失败:', error);
+      }
+      
+      // 测试备用代理
+      try {
+        const fallbackUrl = getChatUrlFallback();
+        console.log('🔗 测试备用代理URL:', fallbackUrl);
+        
+        // 只测试连通性，不发送实际请求
+        const testUrl = `${API_CONFIG.corsProxy.fallback}${encodeURIComponent('https://httpbin.org/get')}`;
+        const response = await fetch(testUrl, {
+          method: 'GET',
+          mode: 'cors'
+        });
+        
+        console.log('📡 备用代理响应状态:', response.status);
+        if (response.ok) {
+          console.log('✅ 备用代理工作正常');
+        }
+        
+      } catch (error) {
+        console.error('❌ 备用代理测试失败:', error);
+      }
+    }
+    
+    console.log('🏁 连接测试完成');
   },
   
   showConfig: function() {
@@ -933,9 +1011,15 @@ window.debugGPTBots = {
 };
 
 console.log('🔧 调试工具已加载! 使用方法:');
-console.log('  debugGPTBots.testConnection() - 测试API服务器连通性');
-console.log('  debugGPTBots.testAPI() - 完整API功能测试');
+console.log('  debugGPTBots.testConnection() - 测试API和CORS代理连通性');
+console.log('  debugGPTBots.testAPI() - 完整API功能测试（含代理重试）');
 console.log('  debugGPTBots.simulateTranslate() - 模拟翻译功能测试');
 console.log('  debugGPTBots.showConfig() - 显示当前配置');
 console.log('  debugGPTBots.testEmail() - 测试邮件读取');
-console.log('💡 如果遇到"Failed to fetch"错误，请先运行 debugGPTBots.testConnection()');
+console.log('');
+console.log('🛠️ CORS解决方案已启用：');
+console.log('  - 主要代理: api.allorigins.win');
+console.log('  - 备用代理: corsproxy.io');
+console.log('  - 自动重试机制：主要代理失败时自动尝试备用代理');
+console.log('');
+console.log('💡 如果仍遇到问题，请先运行 debugGPTBots.testConnection()');
