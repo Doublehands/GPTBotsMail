@@ -6,8 +6,8 @@
   <DefaultLocale>zh-CN</DefaultLocale>
   <DisplayName DefaultValue="GPTBots Copilot"/>
   <Description DefaultValue="GPTBots AI智能邮件助手"/>
-  <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
-  <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/GPTBots-blackicon.png"/>
+  <IconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://doublehands.github.io/GPTBotsMail/"/>
   <AppDomains>
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
@@ -24,7 +24,7 @@
     <Form xsi:type="ItemRead">
       <DesktopSettings>
         <SourceLocation DefaultValue="https://doublehands.github.io/GPTBotsMail/src/taskpane/taskpane.html"/>
-        <RequestedHeight>600</RequestedHeight>
+        <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
@@ -33,5 +33,58 @@
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
   <DisableEntityHighlighting>false</DisableEntityHighlighting>
-
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.3">
+        <bt:Set Name="Mailbox"/>
+      </bt:Sets>
+    </Requirements>
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="msgReadGroup">
+                <Label resid="GroupLabel"/>
+                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                  <Label resid="TaskpaneButton.Label"/>
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label"/>
+                    <Description resid="TaskpaneButton.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://doublehands.github.io/GPTBotsMail/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://doublehands.github.io/GPTBotsMail/src/commands/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://doublehands.github.io/GPTBotsMail/src/taskpane/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GroupLabel" DefaultValue="GPTBots Copilot"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="GPTBots Copilot"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="打开GPTBots AI智能邮件助手"/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
 </OfficeApp>
