@@ -157,27 +157,102 @@ async function processAISkill(skillType, skillName) {
       promptPreview: prompt.substring(0, 100) + '...'
     });
     
-    // 3. 发送到GPTBots API
-    console.log(`🚀 第3步：发送到GPTBots API...`);
-    const response = await sendToGPTBotsAPI(prompt);
+    // 3. 模拟AI处理（延迟2秒）
+    console.log(`🚀 第3步：模拟AI处理...`);
+    console.log(`⏰ 等待2秒以模拟AI处理时间...`);
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    if (!response.success) {
-      console.error(`❌ 第3步失败：API调用失败`, {
-        error: response.error,
-        originalError: response.originalError
-      });
-      showPreviewError(`${skillName}失败: ${response.error}`);
-      return;
+    // 根据技能类型返回预设内容
+    let mockResponse = '';
+    switch (skillType) {
+      case 'reply':
+        mockResponse = `Dear Jacky,
+
+Thank you for contacting GPTBots! We appreciate your interest in our AI solutions for e-commerce support.
+
+Our platform excels in automating high-volume customer interactions:
+
+Seamless Integration: APIs for Shopify/Magento/WooCommerce with 24-hour setup support.
+
+Multilingual Support: 50+ languages including nuanced English/Chinese dialects.
+
+Custom Training: Upload CSV/PDFs to train bots on your catalog/policies (secure encryption).
+
+Accuracy: 92%+ resolution rate for common queries; fallback to human agents via Slack/Teams.
+
+Analytics Dashboard: Real-time metrics on response time, satisfaction, and issue trends.
+
+Attached is a case study showing how Similar Brand reduced ticket volume by 75% in 3 months. We can schedule a personalized demo next week—please suggest your availability.
+
+Looking forward to empowering your customer experience!
+
+Sincerely,
+Jiaqi Li
+Solutions Architect, GPTBots
+contact@gptbots.ai`;
+        break;
+      case 'translate':
+        mockResponse = `主题：关于GPTBots平台AI电商客服解决方案的咨询
+
+尊敬的GPTBots团队：
+
+您好！我是极光的Jacky。
+
+我们正在探索AI驱动的客服解决方案，以实现高效自动化支持。特此咨询：
+
+GPTBots如何与Shopify/Magento等平台集成？
+
+是否支持多语言交互（尤其是中英文）？
+
+能否基于我们的专有数据（产品参数/政策）定制训练？
+
+处理复杂咨询的典型准确率如何？
+
+是否有转接人工客服的自定义流程？
+
+我们的目标是将响应时间缩短至30秒内，并自动化处理80%+的咨询。请提供相关案例或演示选项。
+
+感谢您的支持，期待您的回复！
+
+此致
+敬礼
+Jacky`;
+        break;
+      case 'summary':
+        mockResponse = `询问邮件重点：
+
+需求背景：电商企业寻求AI客服解决方案，要求自动化处理订单查询、退换货、多语言支持（中英文）等高频率问题。
+
+关键问题：平台集成能力、多语言支持、数据定制训练、准确率及人工转接流程。
+
+目标：30秒内响应，80%以上咨询实现自动化。
+
+回复邮件亮点：
+
+技术能力：支持Shopify/Magento等主流电商平台快速对接，覆盖50+语言（含中英文），支持私有数据训练（加密安全）。
+
+性能数据：92%的常见问题解决率，提供实时数据分析看板。
+
+成功案例：同类客户通过部署GPTBots，3个月内减少75%人工工单量。
+
+后续行动：可安排个性化演示，进一步讨论定制方案。
+
+下一步建议：
+
+若需求匹配，可预约演示并细化部署时间表；
+
+如需优先解决特定痛点（如退换货自动化），可提供更详细业务场景供GPTBots优化配置。`;
+        break;
     }
     
-    console.log(`✅ 第3步成功：API调用完成`, {
-      responseLength: response.message ? response.message.length : 0,
-      responsePreview: response.message ? response.message.substring(0, 100) + '...' : '无内容'
+    console.log(`✅ 第3步成功：模拟AI处理完成`, {
+      responseLength: mockResponse.length,
+      responsePreview: mockResponse.substring(0, 100) + '...'
     });
     
     // 4. 显示结果
     console.log(`🎨 第4步：显示结果...`);
-    showPreviewResult(response.message, skillType);
+    showPreviewResult(mockResponse, skillType);
     console.log(`✅ 第4步成功：${skillName}处理完成`);
     
   } catch (error) {
