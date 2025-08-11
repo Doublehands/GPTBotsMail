@@ -8,13 +8,6 @@ const API_CONFIG = {
     // GPTBots API基础URL
     baseUrl: 'https://api.gptbots.ai',
     
-    // CORS代理备用方案
-    corsProxies: [
-        'https://corsproxy.io/?',
-        'https://api.allorigins.win/raw?url=',
-        'https://cors-anywhere.herokuapp.com/'
-    ],
-    
     // 创建对话端点
     createConversationEndpoint: '/v1/conversation',
     
@@ -22,37 +15,19 @@ const API_CONFIG = {
     chatEndpoint: '/v2/conversation/message',
     
     // 不同技能的API密钥配置
+    // 暂时都使用已验证可用的API密钥
     apiKeys: {
-        translate: 'app-6GQY5ONwN73Spp7Li9Bz8o37',    // 深度翻译
-        summary: 'app-BHxaWqTPqQiyein42aVWqkDO',     // 生成摘要
+        translate: 'app-TdfestItJNTTEMBFnGGBm0Yn',    // 深度翻译 (暂用回复密钥)
+        summary: 'app-TdfestItJNTTEMBFnGGBm0Yn',     // 生成摘要 (暂用回复密钥)
         reply: 'app-TdfestItJNTTEMBFnGGBm0Yn'        // 生成回复
     },
     
     // 请求头配置（基础模板）
-    getHeaders: function(skillType, useProxy = false) {
-        const headers = {
+    getHeaders: function(skillType) {
+        return {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.apiKeys[skillType] || this.apiKeys.reply}`
         };
-        
-        // 如果使用代理，可能需要调整头部
-        if (useProxy) {
-            // 某些代理服务可能需要特殊处理
-            headers['X-Requested-With'] = 'XMLHttpRequest';
-        }
-        
-        return headers;
-    },
-    
-    // 获取API URL（支持代理）
-    getApiUrl: function(endpoint, proxyIndex = -1) {
-        const fullUrl = this.baseUrl + endpoint;
-        
-        if (proxyIndex >= 0 && proxyIndex < this.corsProxies.length) {
-            return this.corsProxies[proxyIndex] + encodeURIComponent(fullUrl);
-        }
-        
-        return fullUrl;
     },
     
     // 用户ID
