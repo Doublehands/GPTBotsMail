@@ -157,102 +157,26 @@ async function processAISkill(skillType, skillName) {
       promptPreview: prompt.substring(0, 100) + '...'
     });
     
-    // 3. 模拟AI处理（延迟2秒）
-    console.log(`🚀 第3步：模拟AI处理...`);
-    console.log(`⏰ 等待2秒以模拟AI处理时间...`);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // 3. 发送到GPTBots API
+    console.log(`🚀 第3步：发送到GPTBots API...`);
+    const response = await sendToGPTBotsAPI(prompt, skillType);
     
-    // 根据技能类型返回预设内容
-    let mockResponse = '';
-    switch (skillType) {
-      case 'reply':
-        mockResponse = `Dear Jacky,
-
-Thank you for contacting GPTBots! We appreciate your interest in our AI solutions for e-commerce support.
-
-Our platform excels in automating high-volume customer interactions:
-
-Seamless Integration: APIs for Shopify/Magento/WooCommerce with 24-hour setup support.
-
-Multilingual Support: 50+ languages including nuanced English/Chinese dialects.
-
-Custom Training: Upload CSV/PDFs to train bots on your catalog/policies (secure encryption).
-
-Accuracy: 92%+ resolution rate for common queries; fallback to human agents via Slack/Teams.
-
-Analytics Dashboard: Real-time metrics on response time, satisfaction, and issue trends.
-
-Attached is a case study showing how Similar Brand reduced ticket volume by 75% in 3 months. We can schedule a personalized demo next week—please suggest your availability.
-
-Looking forward to empowering your customer experience!
-
-Sincerely,
-Jiaqi Li
-Solutions Architect, GPTBots
-contact@gptbots.ai`;
-        break;
-      case 'translate':
-        mockResponse = `主题：关于GPTBots平台AI电商客服解决方案的咨询
-
-尊敬的GPTBots团队：
-
-您好！我是极光的Jacky。
-
-我们正在探索AI驱动的客服解决方案，以实现高效自动化支持。特此咨询：
-
-GPTBots如何与Shopify/Magento等平台集成？
-
-是否支持多语言交互（尤其是中英文）？
-
-能否基于我们的专有数据（产品参数/政策）定制训练？
-
-处理复杂咨询的典型准确率如何？
-
-是否有转接人工客服的自定义流程？
-
-我们的目标是将响应时间缩短至30秒内，并自动化处理80%+的咨询。请提供相关案例或演示选项。
-
-感谢您的支持，期待您的回复！
-
-此致
-敬礼
-Jacky`;
-        break;
-      case 'summary':
-        mockResponse = `询问邮件重点：
-
-需求背景：电商企业寻求AI客服解决方案，要求自动化处理订单查询、退换货、多语言支持（中英文）等高频率问题。
-
-关键问题：平台集成能力、多语言支持、数据定制训练、准确率及人工转接流程。
-
-目标：30秒内响应，80%以上咨询实现自动化。
-
-回复邮件亮点：
-
-技术能力：支持Shopify/Magento等主流电商平台快速对接，覆盖50+语言（含中英文），支持私有数据训练（加密安全）。
-
-性能数据：92%的常见问题解决率，提供实时数据分析看板。
-
-成功案例：同类客户通过部署GPTBots，3个月内减少75%人工工单量。
-
-后续行动：可安排个性化演示，进一步讨论定制方案。
-
-下一步建议：
-
-若需求匹配，可预约演示并细化部署时间表；
-
-如需优先解决特定痛点（如退换货自动化），可提供更详细业务场景供GPTBots优化配置。`;
-        break;
+    if (!response.success) {
+      console.error('❌ 第3步失败：API调用失败', response);
+      showPreviewError(`${skillName}失败: ${response.message}`);
+      return;
     }
     
-    console.log(`✅ 第3步成功：模拟AI处理完成`, {
-      responseLength: mockResponse.length,
-      responsePreview: mockResponse.substring(0, 100) + '...'
+    console.log(`✅ 第3步成功：收到AI回复`, {
+      responseLength: response.message.length,
+      responsePreview: response.message.substring(0, 100) + '...'
     });
     
-    // 4. 显示结果
+    // 4. 显示AI回复结果
     console.log(`🎨 第4步：显示结果...`);
-    showPreviewResult(mockResponse, skillType);
+    currentApiResponse = response.message;
+    currentSkillType = skillType;
+    showPreviewResult(response.message, skillType);
     console.log(`✅ 第4步成功：${skillName}处理完成`);
     
   } catch (error) {
@@ -301,7 +225,7 @@ async function run() {
     showLoading('正在分析邮件内容...');
     
     // 2. 发送到GPTBots API
-    const response = await sendToGPTBotsAPI(emailContent);
+    const response = await sendToGPTBotsAPI(emailContent, 'reply');
     if (!response.success) {
       showError('API调用失败: ' + response.error);
       return;
@@ -453,127 +377,73 @@ Jacky`
 /**
  * 发送消息到GPTBots API
  */
-async function sendToGPTBotsAPI(message) {
+async function sendToGPTBotsAPI(message, skillType = 'reply') {
   try {
-    console.log('🔄 开始GPTBots API调用流程...');
+    console.log(`🚀 调用GPTBots API (${skillType})...`);
+    console.log('📝 消息内容:', message.substring(0, 100) + '...');
     
-    // 1. 首先创建对话
-    console.log('📞 第3.1步：创建对话...');
-    const conversationResponse = await createConversation();
-    if (!conversationResponse.success) {
-      console.error('❌ 第3.1步失败：创建对话失败', conversationResponse);
-      return conversationResponse;
+    // 获取对应技能的API密钥
+    const headers = API_CONFIG.getHeaders(skillType);
+    console.log(`🔑 使用API密钥: ${headers.Authorization.substring(0, 20)}...`);
+    
+    // 第一步：创建对话
+    console.log('📞 步骤1: 创建对话...');
+    const createResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        user_id: API_CONFIG.userId
+      })
+    });
+    
+    if (!createResponse.ok) {
+      throw new Error(`创建对话失败: ${createResponse.status} ${createResponse.statusText}`);
     }
     
-    currentConversationId = conversationResponse.conversationId;
-    console.log('✅ 第3.1步成功：对话创建成功', {
-      conversationId: currentConversationId
+    const conversationData = await createResponse.json();
+    const conversationId = conversationData.data.conversation_id;
+    console.log('✅ 步骤1成功: 对话ID =', conversationId);
+    
+    // 第二步：发送消息
+    console.log('💬 步骤2: 发送消息...');
+    const messageResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        conversation_id: conversationId,
+        inputs: {},
+        query: message,
+        response_mode: 'blocking',
+        user: API_CONFIG.userId
+      })
     });
     
-    // 2. 发送消息
-    console.log('💬 第3.2步：发送消息到GPTBots...');
-    console.log('📝 消息内容预览:', {
-      messageLength: message.length,
-      messagePreview: message.substring(0, 200) + '...'
-    });
-    
-    const chatResponse = await sendChatMessage(currentConversationId, message);
-    
-    if (chatResponse.success) {
-      console.log('✅ 第3.2步成功：消息发送成功', {
-        responseLength: chatResponse.message ? chatResponse.message.length : 0
-      });
-    } else {
-      console.error('❌ 第3.2步失败：消息发送失败', chatResponse);
+    if (!messageResponse.ok) {
+      throw new Error(`发送消息失败: ${messageResponse.status} ${messageResponse.statusText}`);
     }
     
-    return chatResponse;
+    const messageData = await messageResponse.json();
+    const aiAnswer = messageData.data.answer;
+    console.log(`✅ 步骤2成功: 收到${skillType}回复，长度 =`, aiAnswer.length);
     
-  } catch (error) {
-    console.error('❌ GPTBots API调用过程中发生异常:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack
-    });
     return {
-      success: false,
-      error: error.message || '未知错误',
-      originalError: error.message
+      success: true,
+      message: aiAnswer,
+      conversationId: conversationId,
+      data: messageData
     };
-  }
-}
-
-/**
- * 创建对话 - 简化版本
- */
-async function createConversation() {
-  try {
-    console.log('🚀 开始创建对话...');
-    const url = getCreateConversationUrl();
-    const data = buildCreateConversationData();
     
-    console.log('📞 API请求 (通过CORS代理):', { url, method: 'POST', data });
-    console.log('🔧 使用cors.io代理解决CORS问题');
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: API_CONFIG.headers,
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP错误: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('✅ 创建对话成功:', result);
-    
-    return parseCreateConversationResponse(result);
   } catch (error) {
-    console.error('❌ 创建对话失败:', error);
+    console.error(`❌ GPTBots API调用失败 (${skillType}):`, error);
     return {
       success: false,
-      error: error.message
+      error: error.message,
+      message: `API调用失败: ${error.message}`
     };
   }
 }
 
 
-
-/**
- * 发送聊天消息 - 简化版本
- */
-async function sendChatMessage(conversationId, message) {
-  try {
-    console.log('💬 开始发送消息...');
-    const url = getChatUrl();
-    const data = buildChatMessageData(conversationId, message);
-    
-    console.log('📞 API请求 (通过CORS代理):', { url, method: 'POST', data });
-    console.log('🔧 使用cors.io代理解决CORS问题');
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: API_CONFIG.headers,
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP错误: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    console.log('✅ 发送消息成功:', result);
-    
-    return parseChatResponse(result);
-  } catch (error) {
-    console.error('❌ 发送消息失败:', error);
-    return {
-      success: false,
-      error: error.message
-    };
-  }
-}
 
 
 
@@ -1002,102 +872,17 @@ let currentSkillType = null;
 // 导出函数以供外部使用
 window.run = run;
 
-// 添加全局调试函数
+// 简化的调试函数
 window.debugGPTBots = {
   testAPI: async function() {
     console.log('🧪 开始API测试...');
     try {
-      const conversation = await createConversation();
-      console.log('测试结果 - 创建对话:', conversation);
-      
-      if (conversation.success) {
-        const chatResult = await sendChatMessage(conversation.conversationId, '测试消息');
-        console.log('测试结果 - 发送消息:', chatResult);
-      }
+      const testPrompt = '请帮我翻译：Hello, this is a test message.';
+      const response = await sendToGPTBotsAPI(testPrompt, 'reply');
+      console.log('API测试结果:', response);
     } catch (error) {
       console.error('API测试失败:', error);
     }
-  },
-  
-  testConnection: async function() {
-    console.log('🌐 测试API连接和代理...');
-    
-    // 测试原始API连接
-    try {
-      const originalUrl = API_CONFIG.baseUrl;
-      console.log('🔗 测试原始API URL:', originalUrl);
-      
-      const response = await fetch(originalUrl, {
-        method: 'GET',
-        mode: 'no-cors'
-      });
-      
-      console.log('📡 原始API响应:', response);
-      console.log('📡 响应类型:', response.type);
-      console.log('📡 响应状态:', response.status);
-      
-      if (response.type === 'opaque') {
-        console.log('✅ 原始API服务器可达，但被CORS策略阻止（这是正常的）');
-      }
-      
-    } catch (error) {
-      console.error('❌ 原始API连接测试失败:', error);
-    }
-    
-    // 测试代理连接
-    if (API_CONFIG.corsProxy && API_CONFIG.corsProxy.enabled) {
-      console.log('🔄 测试CORS代理...');
-      
-      // 测试主要代理
-      try {
-        const proxyUrl = getCreateConversationUrl();
-        console.log('🔗 测试主要代理URL:', proxyUrl);
-        
-        // 只测试连通性，不发送实际请求
-        const testUrl = `${API_CONFIG.corsProxy.primary}${encodeURIComponent('https://httpbin.org/get')}`;
-        const response = await fetch(testUrl, {
-          method: 'GET',
-          mode: 'cors'
-        });
-        
-        console.log('📡 主要代理响应状态:', response.status);
-        if (response.ok) {
-          console.log('✅ 主要代理工作正常');
-        }
-        
-      } catch (error) {
-        console.error('❌ 主要代理测试失败:', error);
-      }
-      
-      // 测试备用代理
-      try {
-        const fallbackUrl = getChatUrlFallback();
-        console.log('🔗 测试备用代理URL:', fallbackUrl);
-        
-        // 只测试连通性，不发送实际请求
-        const testUrl = `${API_CONFIG.corsProxy.fallback}${encodeURIComponent('https://httpbin.org/get')}`;
-        const response = await fetch(testUrl, {
-          method: 'GET',
-          mode: 'cors'
-        });
-        
-        console.log('📡 备用代理响应状态:', response.status);
-        if (response.ok) {
-          console.log('✅ 备用代理工作正常');
-        }
-        
-      } catch (error) {
-        console.error('❌ 备用代理测试失败:', error);
-      }
-    }
-    
-    console.log('🏁 连接测试完成');
-  },
-  
-  showConfig: function() {
-    console.log('📋 当前API配置:', API_CONFIG);
-    console.log('📋 创建对话URL:', getCreateConversationUrl());
-    console.log('📋 发送消息URL:', getChatUrl());
   },
   
   testEmail: async function() {
@@ -1107,18 +892,6 @@ window.debugGPTBots = {
       console.log('邮件读取测试结果:', emailContent);
     } catch (error) {
       console.error('邮件读取测试失败:', error);
-    }
-  },
-  
-  simulateTranslate: async function() {
-    console.log('🔄 模拟翻译测试...');
-    try {
-      // 模拟翻译请求
-      const testPrompt = '请帮我翻译：Hello, this is a test message.';
-      const response = await sendToGPTBotsAPI(testPrompt);
-      console.log('翻译测试结果:', response);
-    } catch (error) {
-      console.error('翻译测试失败:', error);
     }
   }
 };

@@ -14,14 +14,23 @@ const API_CONFIG = {
     // 发送消息端点
     chatEndpoint: '/v2/conversation/message',
     
-    // 请求头配置
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer app-TdfestItJNTTEMBFnGGBm0Yn'
+    // 不同技能的API密钥配置
+    apiKeys: {
+        translate: 'app-6GQY5ONwN73Spp7Li9Bz8o37',    // 深度翻译
+        summary: 'app-BHxaWqTPqQiyein42aVWqkDO',     // 生成摘要
+        reply: 'app-TdfestItJNTTEMBFnGGBm0Yn'        // 生成回复
+    },
+    
+    // 请求头配置（基础模板）
+    getHeaders: function(skillType) {
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKeys[skillType] || this.apiKeys.reply}`
+        };
     },
     
     // 用户ID
-    userId: 'word-gpt-plus-user'
+    userId: 'outlook-addin-user'
 };
 
 // 构建创建对话的请求数据
@@ -42,18 +51,14 @@ function buildChatMessageData(conversationId, message) {
     };
 }
 
-// 获取创建对话的完整URL（使用代理解决CORS）
+// 获取创建对话的完整URL（直接调用，不使用代理）
 function getCreateConversationUrl() {
-    const originalUrl = API_CONFIG.baseUrl + API_CONFIG.createConversationEndpoint;
-    // 使用cors.io代理解决CORS问题（支持所有HTTP头）
-    return `https://cors.io/?${originalUrl}`;
+    return API_CONFIG.baseUrl + API_CONFIG.createConversationEndpoint;
 }
 
-// 获取发送消息的完整URL（使用代理解决CORS）
+// 获取发送消息的完整URL（直接调用，不使用代理）
 function getChatUrl() {
-    const originalUrl = API_CONFIG.baseUrl + API_CONFIG.chatEndpoint;
-    // 使用cors.io代理解决CORS问题（支持所有HTTP头）
-    return `https://cors.io/?${originalUrl}`;
+    return API_CONFIG.baseUrl + API_CONFIG.chatEndpoint;
 }
 
 // 解析创建对话的响应
