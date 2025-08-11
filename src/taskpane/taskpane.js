@@ -342,8 +342,8 @@ async function readEmailContent() {
       }
       
       console.log('✅ Mailbox对象可用');
-      
-      const item = Office.context.mailbox.item;
+
+  const item = Office.context.mailbox.item;
       
       if (!item) {
         console.error('❌ 无法获取邮件项目，可能没有选中邮件');
