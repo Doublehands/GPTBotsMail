@@ -886,6 +886,32 @@ let currentSkillType = null;
 // 导出函数以供外部使用
 window.run = run;
 
+// 添加调试函数
+window.debugAPI = function() {
+  console.log('🔍 API配置调试信息:');
+  console.log('baseUrl:', API_CONFIG.baseUrl);
+  console.log('API密钥:', API_CONFIG.apiKeys);
+  
+  // 测试网络连接
+  console.log('🧪 开始网络测试...');
+  fetch(API_CONFIG.baseUrl + '/conversation', {
+    method: 'POST',
+    headers: API_CONFIG.getHeaders('translate'),
+    body: JSON.stringify({user_id: 'debug-test'})
+  }).then(async response => {
+    console.log('✅ 网络测试结果:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    });
+    
+    const data = await response.json();
+    console.log('📊 响应数据:', data);
+  }).catch(error => {
+    console.error('❌ 网络测试失败:', error);
+  });
+};
+
 // 简化的调试函数
 window.debugGPTBots = {
   testAPI: async function() {

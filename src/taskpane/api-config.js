@@ -5,8 +5,14 @@
 
 // API配置对象
 const API_CONFIG = {
-    // 使用Vercel代理服务
+    // 主要代理服务 - 如果重新部署后URL变了，请更新这里
     baseUrl: 'https://gpt-bots-mail-gskhi81x1-jackylees-projects-b81f52c7.vercel.app/api',
+    
+    // 备用代理服务（如果主要代理失败）
+    fallbackUrls: [
+        'https://corsproxy.io/?https://api.gptbots.ai',
+        'https://api.allorigins.win/raw?url=https://api.gptbots.ai'
+    ],
     
     // 创建对话端点
     createConversationEndpoint: '/conversation',
