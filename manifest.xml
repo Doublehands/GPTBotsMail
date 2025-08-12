@@ -13,10 +13,8 @@
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
     <AppDomain>https://api.gptbots.ai</AppDomain>
     <AppDomain>https://api-sg.gptbots.ai</AppDomain>
-    <AppDomain>https://*.vercel.app</AppDomain>
-    <AppDomain>https://gpt-bots-mail-gskhi81x1-jackylees-projects-b81f52c7.vercel.app</AppDomain>
-    <AppDomain>https://gpt-bots-mail-5ew6g9q9y-jackylees-projects-b81f52c7.vercel.app</AppDomain>
-    <AppDomain>https://gpt-bots-mail-47r8-1m92bxayg-jackylees-projects-b81f52c7.vercel.app</AppDomain>
+    <AppDomain>https://cors-anywhere.herokuapp.com</AppDomain>
+    <AppDomain>https://corsproxy.io</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>

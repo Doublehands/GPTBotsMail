@@ -5,17 +5,15 @@
 
 // API配置对象
 const API_CONFIG = {
-    // 直接使用GPTBots API（新加坡端点）- manifest.xml中已配置权限
-    baseUrl: 'https://api-sg.gptbots.ai',
-    
-    // 备用代理服务（如果主要代理失败）
-    fallbackUrls: [
-        'https://corsproxy.io/?https://api.gptbots.ai',
-        'https://api.allorigins.win/raw?url=https://api.gptbots.ai'
+    // 多个代理URL，按优先级排序
+    proxyUrls: [
+        'https://api-sg.gptbots.ai',  // 直接尝试（可能因CORS失败）
+        'https://cors-anywhere.herokuapp.com/https://api-sg.gptbots.ai',
+        'https://corsproxy.io/?https://api-sg.gptbots.ai'
     ],
     
-    // 直接API调用（作为最后的备用方案）- 新加坡端点
-    directApiUrl: 'https://api-sg.gptbots.ai',
+    // 当前使用的代理索引
+    currentProxyIndex: 0,
     
     // 创建对话端点
     createConversationEndpoint: '/v1/conversation',
@@ -53,28 +51,47 @@ function buildCreateConversationData() {
 function buildChatMessageData(conversationId, message) {
     return {
         conversation_id: conversationId,
-        inputs: {},
-        query: message,
         response_mode: 'blocking',
-        user: API_CONFIG.userId
+        messages: [
+            {
+                role: "user",
+                content: message
+            }
+        ]
     };
 }
 
-// 获取创建对话的完整URL（直接调用，不使用代理）
-function getCreateConversationUrl() {
-    return API_CONFIG.baseUrl + API_CONFIG.createConversationEndpoint;
+// 获取当前代理的基础URL
+function getCurrentProxyUrl() {
+    return API_CONFIG.proxyUrls[API_CONFIG.currentProxyIndex];
 }
 
-// 获取发送消息的完整URL（直接调用，不使用代理）
+// 获取创建对话的完整URL
+function getCreateConversationUrl() {
+    return getCurrentProxyUrl() + API_CONFIG.createConversationEndpoint;
+}
+
+// 获取发送消息的完整URL
 function getChatUrl() {
-    return API_CONFIG.baseUrl + API_CONFIG.chatEndpoint;
+    return getCurrentProxyUrl() + API_CONFIG.chatEndpoint;
+}
+
+// 切换到下一个代理
+function switchToNextProxy() {
+    API_CONFIG.currentProxyIndex = (API_CONFIG.currentProxyIndex + 1) % API_CONFIG.proxyUrls.length;
+    console.log(`🔄 切换到代理 ${API_CONFIG.currentProxyIndex + 1}:`, getCurrentProxyUrl());
+}
+
+// 重置到第一个代理
+function resetProxy() {
+    API_CONFIG.currentProxyIndex = 0;
 }
 
 // 解析创建对话的响应
 function parseCreateConversationResponse(response) {
     return {
         success: true,
-        conversationId: response.data.conversation_id,
+        conversationId: response.conversation_id,
         data: response
     };
 }
@@ -83,7 +100,7 @@ function parseCreateConversationResponse(response) {
 function parseChatResponse(response) {
     return {
         success: true,
-        answer: response.data.answer,
+        answer: response.output[0].content.text,
         data: response
     };
 }

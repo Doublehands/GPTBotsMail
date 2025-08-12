@@ -378,23 +378,28 @@ Jacky`
  * 发送消息到GPTBots API
  */
 async function sendToGPTBotsAPI(message, skillType = 'reply') {
-  try {
-    console.log(`🚀 调用GPTBots API (${skillType})...`);
-    console.log('📝 消息内容:', message.substring(0, 100) + '...');
-    
-    // 获取对应技能的API密钥
-    const headers = API_CONFIG.getHeaders(skillType);
-    console.log(`🔑 使用API密钥: ${headers.Authorization.substring(0, 20)}...`);
-    
-    // 第一步：创建对话
-    console.log('📞 步骤1: 创建对话...');
-    const createResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.createConversationEndpoint}`, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        user_id: API_CONFIG.userId
-      })
-    });
+  const maxRetries = API_CONFIG.proxyUrls.length;
+  let lastError = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      console.log(`🚀 调用GPTBots API (${skillType}) - 尝试 ${attempt + 1}/${maxRetries}...`);
+      console.log('📝 消息内容:', message.substring(0, 100) + '...');
+      console.log('🌐 当前代理:', getCurrentProxyUrl());
+      
+      // 获取对应技能的API密钥
+      const headers = API_CONFIG.getHeaders(skillType);
+      console.log(`🔑 使用API密钥: ${headers.Authorization.substring(0, 20)}...`);
+      
+      // 第一步：创建对话
+      console.log('📞 步骤1: 创建对话...');
+      const createResponse = await fetch(getCreateConversationUrl(), {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({
+          user_id: API_CONFIG.userId
+        })
+      });
     
     if (!createResponse.ok) {
       const errorText = await createResponse.text();
@@ -421,7 +426,7 @@ async function sendToGPTBotsAPI(message, skillType = 'reply') {
     
     // 第二步：发送消息
     console.log('💬 步骤2: 发送消息...');
-    const messageResponse = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.chatEndpoint}`, {
+    const messageResponse = await fetch(getChatUrl(), {
       method: "POST",
       headers: headers,
       body: JSON.stringify({
@@ -468,21 +473,35 @@ async function sendToGPTBotsAPI(message, skillType = 'reply') {
       throw new Error('无法获取AI回复');
     }
     
-    return {
-      success: true,
-      message: aiAnswer,
-      conversationId: conversationId,
-      data: messageData
-    };
-    
-  } catch (error) {
-    console.error(`❌ GPTBots API调用失败 (${skillType}):`, error);
-    return {
-      success: false,
-      error: error.message,
-      message: `API调用失败: ${error.message}`
-    };
+      return {
+        success: true,
+        message: aiAnswer,
+        conversationId: conversationId,
+        data: messageData
+      };
+      
+    } catch (error) {
+      console.error(`❌ 尝试 ${attempt + 1} 失败:`, error.message);
+      lastError = error;
+      
+      // 如果不是最后一次尝试，切换到下一个代理
+      if (attempt < maxRetries - 1) {
+        switchToNextProxy();
+        console.log(`🔄 切换到下一个代理，继续尝试...`);
+        continue;
+      }
+    }
   }
+  
+  // 所有代理都失败了
+  console.error(`❌ 所有代理都失败了，最后错误:`, lastError);
+  resetProxy(); // 重置到第一个代理以备下次使用
+  
+  return {
+    success: false,
+    error: lastError?.message || '未知错误',
+    message: `API调用失败: ${lastError?.message || '未知错误'}。已尝试直接调用和CORS代理。`
+  };
 }
 
 
