@@ -1,6 +1,0 @@
-{
-  "name": "gptbots-proxy",
-  "version": "1.0.0",
-  "description": "GPTBots API代理服务",
-  "type": "module"
-}
