@@ -28,18 +28,20 @@
  }
 
  .ms-welcome__main {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-direction: column;
-    flex-direction: column;
-    -webkit-flex-wrap: nowrap;
-    flex-wrap: nowrap;
-    -webkit-align-items: center;
-    align-items: center;
-    -webkit-flex: 1 0 0;
-    flex: 1 0 0;
-    padding: 10px 20px;
- }
+   display: -webkit-flex;
+   display: flex;
+   -webkit-flex-direction: column;
+   flex-direction: column;
+   -webkit-flex-wrap: nowrap;
+   flex-wrap: nowrap;
+   -webkit-align-items: center;
+   align-items: center;
+   -webkit-flex: 1 0 0;
+   flex: 1 0 0;
+   padding: 10px 20px;
+   min-height: 100vh;
+   justify-content: space-between;
+}
  
  .ms-welcome__main > h2 {
      width: 100%;
@@ -92,6 +94,15 @@ b {
 
 .gptbots-app-body.show {
     display: flex;
+}
+
+/* 内容区域样式 */
+.gptbots-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 /* Logo样式 */
@@ -169,32 +180,43 @@ b {
     font-weight: 600;
 }
 
-/* 预览框样式 */
+/* 预览框样式 - 与AI技能按钮风格一致，固定在底部 */
 .gptbots-preview-box {
     width: 100%;
     max-width: 500px;
     background: #ffffff;
     border: 1px solid #e1e5e9;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
     overflow: hidden;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .gptbots-preview-box h3 {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     margin: 0;
-    padding: 16px 20px;
-    border-bottom: 1px solid #e1e5e9;
+    padding: 12px 16px;
+    border-bottom: 1px solid #dee2e6;
     font-weight: 600;
-    color: #323130;
+    color: #495057;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.gptbots-preview-box h3:before {
+    content: "🤖";
+    font-size: 16px;
 }
 
 .gptbots-preview-content {
-    padding: 20px;
-    min-height: 120px;
-    max-height: 400px;
+    padding: 16px;
+    min-height: 100px;
+    max-height: 300px;
     overflow-y: auto;
+    background: #fafbfc;
 }
 
 .gptbots-loading {
@@ -210,7 +232,14 @@ b {
 
 .gptbots-result-text {
     line-height: 1.6;
-    color: #323130;
+    color: #495057;
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .result-content {
@@ -250,42 +279,52 @@ b {
 }
 
 .gptbots-preview-actions {
-    padding: 16px 20px;
-    background: #f8f9fa;
-    border-top: 1px solid #e1e5e9;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-top: 1px solid #dee2e6;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: flex-end;
 }
 
 .gptbots-action-btn {
-    padding: 8px 16px;
-    border: 1px solid #d1d1d1;
+    padding: 6px 12px;
+    border: 1px solid #ced4da;
     border-radius: 6px;
     background: #ffffff;
-    color: #323130;
-    font-size: 14px;
+    color: #495057;
+    font-size: 13px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-family: inherit;
+    font-weight: 500;
+    min-width: 60px;
+    text-align: center;
 }
 
 .gptbots-action-btn:hover {
-    background: #f3f2f1;
+    background: #f8f9fa;
     border-color: #0078d7;
+    color: #0078d7;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 120, 215, 0.1);
 }
 
 .gptbots-action-btn.gptbots-primary {
-    background: #0078d7;
+    background: linear-gradient(135deg, #0078d7 0%, #106ebe 100%);
     color: #ffffff;
     border-color: #0078d7;
+    font-weight: 600;
 }
 
 .gptbots-action-btn.gptbots-primary:hover {
-    background: #106ebe;
+    background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
     border-color: #106ebe;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 110, 190, 0.2);
 }
 
 .gptbots-action-btn:active {
-    transform: translateY(1px);
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
