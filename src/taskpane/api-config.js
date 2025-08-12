@@ -5,8 +5,8 @@
 
 // API配置对象
 const API_CONFIG = {
-    // 主要代理服务 - 新的Vercel代理（使用新加坡端点）
-    baseUrl: 'https://gpt-bots-mail-47r8-1m92bxayg-jackylees-projects-b81f52c7.vercel.app/api',
+    // 直接使用GPTBots API（新加坡端点）- manifest.xml中已配置权限
+    baseUrl: 'https://api-sg.gptbots.ai',
     
     // 备用代理服务（如果主要代理失败）
     fallbackUrls: [
@@ -18,10 +18,10 @@ const API_CONFIG = {
     directApiUrl: 'https://api-sg.gptbots.ai',
     
     // 创建对话端点
-    createConversationEndpoint: '/conversation',
+    createConversationEndpoint: '/v1/conversation',
     
     // 发送消息端点
-    chatEndpoint: '/message',
+    chatEndpoint: '/v2/conversation/message',
     
     // 不同技能的API密钥配置
     apiKeys: {
