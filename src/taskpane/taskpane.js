@@ -779,8 +779,15 @@ async function useResult() {
     
     switch (currentSkillType) {
       case 'reply':
-        // 生成回复：创建回复邮件
-        Office.context.mailbox.item.displayReplyForm(currentApiResponse);
+        // 生成回复：创建回复邮件，处理换行格式
+        const formattedContent = formatEmailContent(currentApiResponse);
+        console.log('📧 格式化前的内容:', currentApiResponse.substring(0, 200) + '...');
+        console.log('📧 格式化后的内容:', formattedContent.substring(0, 200) + '...');
+        
+        const replyOptions = {
+          htmlBody: formattedContent
+        };
+        Office.context.mailbox.item.displayReplyForm(replyOptions);
         showSuccess('回复窗口已打开，内容已填入');
         break;
         
@@ -807,6 +814,26 @@ async function useResult() {
     console.error('❌ 使用结果失败:', error);
     alert('操作失败: ' + error.message);
   }
+}
+
+/**
+ * 格式化邮件内容，将文本换行转换为HTML格式
+ */
+function formatEmailContent(text) {
+  if (!text) return '';
+  
+  // 将文本换行转换为HTML换行
+  let htmlContent = text
+    .replace(/\r\n/g, '\n')  // 统一换行符
+    .replace(/\n\n/g, '</p><p>')  // 双换行转换为段落
+    .replace(/\n/g, '<br>')  // 单换行转换为<br>
+    .replace(/^/, '<p>')  // 开头添加段落标签
+    .replace(/$/, '</p>');  // 结尾添加段落标签
+  
+  // 处理空段落
+  htmlContent = htmlContent.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
+  
+  return htmlContent;
 }
 
 /**
