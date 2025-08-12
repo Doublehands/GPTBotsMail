@@ -1,0 +1,18 @@
+{
+  "name": "gptbots-proxy",
+  "version": "1.0.0",
+  "description": "GPTBots API代理服务 - 解决CORS跨域问题",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["gptbots", "proxy", "cors", "vercel", "serverless"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}

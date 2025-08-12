@@ -5,20 +5,19 @@
 
 // API配置对象
 const API_CONFIG = {
-    // GPTBots API基础URL
-    baseUrl: 'https://api.gptbots.ai',
+    // 使用Vercel代理服务 - 请替换为您的实际Vercel项目URL
+    baseUrl: 'https://your-actual-project-name.vercel.app/api',
     
     // 创建对话端点
-    createConversationEndpoint: '/v1/conversation',
+    createConversationEndpoint: '/conversation',
     
     // 发送消息端点
-    chatEndpoint: '/v2/conversation/message',
+    chatEndpoint: '/message',
     
     // 不同技能的API密钥配置
-    // 暂时都使用已验证可用的API密钥
     apiKeys: {
-        translate: 'app-TdfestItJNTTEMBFnGGBm0Yn',    // 深度翻译 (暂用回复密钥)
-        summary: 'app-TdfestItJNTTEMBFnGGBm0Yn',     // 生成摘要 (暂用回复密钥)
+        translate: 'app-6GQY5ONwN73Spp7Li9Bz8o37',    // 深度翻译
+        summary: 'app-BHxaWqTPqQiyein42aVWqkDO',     // 生成摘要
         reply: 'app-TdfestItJNTTEMBFnGGBm0Yn'        // 生成回复
     },
     
