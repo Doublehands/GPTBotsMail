@@ -28,21 +28,18 @@
  }
 
  .ms-welcome__main {
-   display: -webkit-flex;
-   display: flex;
-   -webkit-flex-direction: column;
-   flex-direction: column;
-   -webkit-flex-wrap: nowrap;
-   flex-wrap: nowrap;
-   -webkit-align-items: center;
-   align-items: center;
-   -webkit-flex: 1 0 0;
-   flex: 1 0 0;
-   padding: 10px 20px;
-   height: 100vh;
-   position: relative;
-   overflow: hidden;
-}
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-flex: 1 0 0;
+    flex: 1 0 0;
+    padding: 10px 20px;
+ }
  
  .ms-welcome__main > h2 {
      width: 100%;
@@ -172,50 +169,31 @@ b {
     font-weight: 600;
 }
 
-/* 预览框样式 - 固定在底部 */
+/* 预览框样式 */
 .gptbots-preview-box {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
     width: 100%;
-    max-height: 60vh;
+    max-width: 500px;
     background: #ffffff;
-    border: none;
-    border-top: 2px solid #0078d7;
-    border-radius: 12px 12px 0 0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
     overflow: hidden;
-    z-index: 1000;
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
 }
 
 .gptbots-preview-box h3 {
-    background: linear-gradient(135deg, #0078d7, #106ebe);
+    background: #f8f9fa;
     margin: 0;
     padding: 16px 20px;
     border-bottom: 1px solid #e1e5e9;
     font-weight: 600;
-    color: #ffffff;
-    text-align: center;
-    position: relative;
+    color: #323130;
 }
 
 .gptbots-preview-content {
     padding: 20px;
     min-height: 120px;
-    max-height: 35vh;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -273,56 +251,41 @@ b {
 
 .gptbots-preview-actions {
     padding: 16px 20px;
-    background: linear-gradient(135deg, #f8f9fa, #e8f4fd);
-    border-top: 1px solid #0078d7;
+    background: #f8f9fa;
+    border-top: 1px solid #e1e5e9;
     display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
 .gptbots-action-btn {
-    padding: 10px 20px;
-    border: 2px solid #0078d7;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
     background: #ffffff;
-    color: #0078d7;
+    color: #323130;
     font-size: 14px;
-    font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     font-family: inherit;
-    min-width: 80px;
-    text-align: center;
 }
 
 .gptbots-action-btn:hover {
-    background: #0078d7;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 120, 215, 0.3);
+    background: #f3f2f1;
+    border-color: #0078d7;
 }
 
 .gptbots-action-btn.gptbots-primary {
-    background: linear-gradient(135deg, #0078d7, #106ebe);
+    background: #0078d7;
     color: #ffffff;
     border-color: #0078d7;
-    box-shadow: 0 2px 8px rgba(0, 120, 215, 0.2);
 }
 
 .gptbots-action-btn.gptbots-primary:hover {
-    background: linear-gradient(135deg, #106ebe, #005a9e);
-    border-color: #005a9e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 120, 215, 0.4);
+    background: #106ebe;
+    border-color: #106ebe;
 }
 
 .gptbots-action-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 120, 215, 0.2);
-}
-
-/* 为主内容区域添加底部间距，避免被预览框遮挡 */
-.ms-welcome__features {
-    margin-bottom: 80px;
+    transform: translateY(1px);
 }
