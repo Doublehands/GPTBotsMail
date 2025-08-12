@@ -5,8 +5,8 @@
 
 // API配置对象
 const API_CONFIG = {
-    // 主要代理服务 - Vercel代理（已关闭授权保护）
-    baseUrl: 'https://gpt-bots-mail-5ew6g9q9y-jackylees-projects-b81f52c7.vercel.app/api',
+    // 主要代理服务 - 新的Vercel代理（使用新加坡端点）
+    baseUrl: 'https://gpt-bots-mail-47r8-1m92bxayg-jackylees-projects-b81f52c7.vercel.app/api',
     
     // 备用代理服务（如果主要代理失败）
     fallbackUrls: [
