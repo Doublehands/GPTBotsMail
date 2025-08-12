@@ -692,10 +692,15 @@ function showPreviewError(errorMessage) {
   const preview = document.getElementById('result-preview');
   const loading = document.getElementById('loading-indicator');
   const resultText = document.getElementById('result-text');
+  const useButton = document.getElementById('use-result');
   
   preview.classList.remove('gptbots-hidden');
   loading.classList.add('gptbots-hidden');
   resultText.classList.remove('gptbots-hidden');
+  
+  // 错误时隐藏"使用"按钮
+  useButton.style.display = 'none';
+  
   resultText.innerHTML = `
     <div class="error-message">
       <i class="ms-Icon ms-Icon--ErrorBadge"></i>
@@ -711,10 +716,18 @@ function showPreviewResult(result, skillType) {
   const preview = document.getElementById('result-preview');
   const loading = document.getElementById('loading-indicator');
   const resultText = document.getElementById('result-text');
+  const useButton = document.getElementById('use-result');
   
   preview.classList.remove('gptbots-hidden');
   loading.classList.add('gptbots-hidden');
   resultText.classList.remove('gptbots-hidden');
+  
+  // 根据技能类型显示/隐藏"使用"按钮
+  if (skillType === 'reply') {
+    useButton.style.display = 'inline-block';
+  } else {
+    useButton.style.display = 'none';
+  }
   
   // 保存当前结果和类型，供后续操作使用
   currentApiResponse = result;
@@ -801,7 +814,12 @@ async function useResult() {
  */
 function closePreview() {
   const preview = document.getElementById('result-preview');
+  const useButton = document.getElementById('use-result');
+  
   preview.classList.add('gptbots-hidden');
+  
+  // 重置按钮状态
+  useButton.style.display = 'inline-block';
   
   // 清理状态
   currentApiResponse = null;
