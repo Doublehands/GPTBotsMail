@@ -6,6 +6,7 @@
 // API配置对象
 const API_CONFIG = {
     // 使用Vercel代理服务 - 请替换为您的实际Vercel项目URL
+    // TODO: 部署完成后，请将下面的URL替换为您的实际Vercel项目URL
     baseUrl: 'https://your-actual-project-name.vercel.app/api',
     
     // 创建对话端点
