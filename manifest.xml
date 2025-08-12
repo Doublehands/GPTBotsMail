@@ -13,6 +13,7 @@
     <AppDomain>https://doublehands.github.io/GPTBotsMail</AppDomain>
     <AppDomain>https://api.gptbots.ai</AppDomain>
     <AppDomain>https://*.vercel.app</AppDomain>
+    <AppDomain>https://gpt-bots-mail-gskhi81x1-jackylees-projects-b81f52c7.vercel.app</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
