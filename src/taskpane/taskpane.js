@@ -408,8 +408,16 @@ async function sendToGPTBotsAPI(message, skillType = 'reply') {
     }
     
     const conversationData = await createResponse.json();
-    const conversationId = conversationData.data.conversation_id;
+    console.log('📊 创建对话响应数据:', conversationData);
+    
+    // 处理不同的响应格式
+    const conversationId = conversationData.data?.conversation_id || conversationData.conversation_id;
     console.log('✅ 步骤1成功: 对话ID =', conversationId);
+    
+    if (!conversationId) {
+      console.error('❌ 无法获取对话ID，完整响应:', conversationData);
+      throw new Error('无法获取对话ID');
+    }
     
     // 第二步：发送消息
     console.log('💬 步骤2: 发送消息...');
@@ -418,10 +426,13 @@ async function sendToGPTBotsAPI(message, skillType = 'reply') {
       headers: headers,
       body: JSON.stringify({
         conversation_id: conversationId,
-        inputs: {},
-        query: message,
         response_mode: 'blocking',
-        user: API_CONFIG.userId
+        messages: [
+          {
+            role: "user",
+            content: message
+          }
+        ]
       })
     });
     
@@ -437,8 +448,25 @@ async function sendToGPTBotsAPI(message, skillType = 'reply') {
     }
     
     const messageData = await messageResponse.json();
-    const aiAnswer = messageData.data.answer;
-    console.log(`✅ 步骤2成功: 收到${skillType}回复，长度 =`, aiAnswer.length);
+    console.log('📊 发送消息响应数据:', messageData);
+    
+    // 根据新的API响应格式解析
+    let aiAnswer = '';
+    if (messageData.output && messageData.output.length > 0) {
+      // 新格式：从output数组中提取text内容
+      const firstOutput = messageData.output[0];
+      aiAnswer = firstOutput.content?.text || '';
+    } else {
+      // 兼容旧格式
+      aiAnswer = messageData.data?.answer || messageData.answer || '';
+    }
+    
+    console.log(`✅ 步骤2成功: 收到${skillType}回复，长度 =`, aiAnswer?.length || 0);
+    
+    if (!aiAnswer) {
+      console.error('❌ 无法获取AI回复，完整响应:', messageData);
+      throw new Error('无法获取AI回复');
+    }
     
     return {
       success: true,

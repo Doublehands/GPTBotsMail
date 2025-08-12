@@ -21,8 +21,8 @@ export default async function handler(req, res) {
   try {
     console.log('📞 代理创建对话请求...');
     
-    // 转发请求到GPTBots API
-    const response = await fetch('https://api.gptbots.ai/v1/conversation', {
+    // 转发请求到GPTBots API (新加坡端点)
+    const response = await fetch('https://api-sg.gptbots.ai/v1/conversation', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

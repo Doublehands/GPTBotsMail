@@ -14,8 +14,8 @@ const API_CONFIG = {
         'https://api.allorigins.win/raw?url=https://api.gptbots.ai'
     ],
     
-    // 直接API调用（作为最后的备用方案）
-    directApiUrl: 'https://api.gptbots.ai',
+    // 直接API调用（作为最后的备用方案）- 新加坡端点
+    directApiUrl: 'https://api-sg.gptbots.ai',
     
     // 创建对话端点
     createConversationEndpoint: '/conversation',

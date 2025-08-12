@@ -20,9 +20,10 @@ export default async function handler(req, res) {
 
   try {
     console.log('💬 代理发送消息请求...');
+    console.log('📝 请求数据:', req.body);
     
-    // 转发请求到GPTBots API
-    const response = await fetch('https://api.gptbots.ai/v2/conversation/message', {
+    // 转发请求到GPTBots API (新加坡端点)
+    const response = await fetch('https://api-sg.gptbots.ai/v2/conversation/message', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
